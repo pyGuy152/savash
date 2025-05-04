@@ -60,3 +60,11 @@ def update_user(user_cred: schemas.UserCreate, tokenData = Depends(oauth2.get_cu
     new_user = cur.fetchone()
     conn.commit()
     return new_user
+
+@router.delete('/',status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(tokenData = Depends(oauth2.get_current_user)):
+    cur.execute("DELETE FROM users WHERE user_id = %s RETURNING *;", (tokenData.id,))
+    del_user = cur.fetchone()
+    conn.commit()
+    if not del_user:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No user deleted")
