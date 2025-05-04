@@ -4,7 +4,10 @@ import './Register.css';
 
 const apiUrl = "https://api.codewasabi.xyz";
 
+import { useNavigate } from "react-router-dom";
+
 function Register() {
+    const navigate = useNavigate();
     
     function submitForm(event : React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -14,10 +17,12 @@ function Register() {
         const passwordElem = document.getElementById("password") as HTMLInputElement;
         const nameElem = document.getElementById("name") as HTMLInputElement;
         const usernameElem = document.getElementById("username") as HTMLInputElement;
+        const roleElem = document.getElementById("role") as HTMLInputElement;
         let email = emailElem.value;
         let password = passwordElem.value;
         let name = nameElem.value;
         let username = usernameElem.value;
+        let role = roleElem.checked ? "teacher" : "student";
         if (email === "" || password === "") {
           alert("Please fill in all fields.");
           return;
@@ -38,7 +43,7 @@ function Register() {
           alert("Please enter a valid email address.");
           return;
         }
-        const data = { email, password, name, username, role: "teacher" };
+        const data = { email, password, name, username, role };
         console.log(apiUrl);
         fetch(apiUrl + "/users", {
             body: JSON.stringify(data),
@@ -46,14 +51,16 @@ function Register() {
             headers: {
                 "Content-Type": "application/json",
             }
-        })
+        }).then(() => {
+            navigate("/login");
+        });
     }
 
     return (
       <div>
         <HomeNav />
         <form className="Register" onSubmit={submitForm}>
-          <h2>Teacher Account</h2>
+          <h2>Create Account</h2>
           <label htmlFor="name">Name:</label>
           <input type="text" name="name" id="name" required />
           <label htmlFor="username">Username:</label>
@@ -70,6 +77,10 @@ function Register() {
           <label htmlFor="password">Password:</label>
           <input type="password" name="password" id="password" required />
           <br />
+          <label htmlFor="role">
+            I am a teacher:
+            <input type="checkbox" name="role" id="role" className="isTeacher" />
+          </label>
           <button type="submit" className="submit">
             Register
           </button>

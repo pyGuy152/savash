@@ -19,11 +19,11 @@ function HomeNav() {
         </ul>
         <ul className="right">
           <li>
-            <Link to="/login">Student</Link>
+            <Link to="/login">Login</Link>
           </li>
           <li>
             <Link to="/register">
-              <button className="register">Teacher</button>
+              <button className="register">Register</button>
             </Link>
           </li>
         </ul>
