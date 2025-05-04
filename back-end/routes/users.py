@@ -4,7 +4,7 @@ import psycopg2, os, time
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from .. import schemas
+from .. import schemas, utils
 
 load_dotenv()
 db_user = os.getenv("DB_User")
@@ -38,6 +38,7 @@ def check_user(username: str, email: str):
 def make_user(user_cred: schemas.UserCreate):
     if check_user(user_cred.username,user_cred.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")
+    user_cred.password = utils.get_password_hash(user_cred.password)
     cur.execute("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     new_user = cur.fetchone()
     conn.commit()
