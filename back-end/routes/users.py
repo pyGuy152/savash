@@ -55,3 +55,13 @@ def get_user(username: str):
     cur.execute("SELECT * FROM users WHERE username = %s;",(username,))
     user = cur.fetchone()
     return user
+
+@router.put('/{username}', response_model=schemas.UserOut)
+def update_user(user_cred: schemas.UserCreate, username :str):
+    if check_user(user_cred.username,user_cred.email):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")
+    user_cred.password = utils.get_password_hash(user_cred.password)
+    cur.execute("UPDATE users SET name = %s, username = %s, email = %s, password = %s, role = %s WHERE username = %s RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,username,))
+    new_user = cur.fetchone()
+    conn.commit()
+    return new_user
