@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 import os, time, psycopg2
 from psycopg2 import Error
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from .. import schemas
 
@@ -13,7 +14,7 @@ conn = None
 cur = None
 while True:
     try:
-        conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432')
+        conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
         cur = conn.cursor()
         print("connected to db")
         break
