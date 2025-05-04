@@ -1,17 +1,17 @@
-from fastapi import APIRouter
-import os, time, psycopg2
+from pickletools import int4
+from typing import List
+from fastapi import APIRouter, status, HTTPException, Depends
+import psycopg2, os, time
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from .. import schemas
+from .. import schemas, utils, oauth2
 
 load_dotenv()
 db_user = os.getenv("DB_User")
 db_pass = os.getenv("DB_User_PASS")
 
 # connect and create a cursor for the db
-conn = None
-cur = None
 while True:
     try:
         conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
@@ -25,8 +25,8 @@ while True:
         time.sleep(5)
 
 
-router = APIRouter(tags=['Auth'])
+router = APIRouter(prefix='/class',tags=['Classes'])
 
-@router.post("/login")
-def login(user_cred: schemas.LoginInput):
-    return {'data':user_cred}
+@router.get("/")
+def get_class():
+    return {'message':"welcome to da class"}

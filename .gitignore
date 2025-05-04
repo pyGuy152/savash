@@ -1,5 +1,5 @@
 .env
 venv
 .vscode
-app/__pycache__
-app/routes/__pycache__
+back-end/__pycache__
+back-end/routes/__pycache__
