@@ -3,7 +3,7 @@ import os, time, psycopg2
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from .. import schemas, utils
+from .. import schemas, utils, oauth2
 
 load_dotenv()
 db_user = os.getenv("DB_User")
@@ -31,7 +31,9 @@ def login(user_cred: schemas.LoginInput):
     hashed_pass = cur.fetchone()
     try:
         if utils.verify_password(user_cred.password,hashed_pass['password']): # type: ignore
-            return {'message':"logged in"}
+            access_token = oauth2.create_access_token(data = {"user_id": hashed_pass['user_id']}) # type: ignore
+            return {'access_token':access_token, 'token_type':"bearer"}
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
