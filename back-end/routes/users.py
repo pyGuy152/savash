@@ -1,3 +1,4 @@
+from pickletools import int4
 from typing import List
 from fastapi import APIRouter, status, HTTPException
 import psycopg2, os, time
@@ -27,7 +28,7 @@ while True:
 router = APIRouter(prefix='/users',tags=['Users'])
 
 def check_user(username: str, email: str):
-    cur.execute("SELECT * FROM users WHERE username = %s OR email = %s;",(username,email,))
+    cur.execute("SELECT * FROM users WHERE email = %s;",(email,))
     user = cur.fetchone()
     if not user:
         return False
@@ -37,7 +38,7 @@ def check_user(username: str, email: str):
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def make_user(user_cred: schemas.UserCreate):
     if check_user(user_cred.username,user_cred.email):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email aldready taken")
     user_cred.password = utils.get_password_hash(user_cred.password)
     cur.execute("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     new_user = cur.fetchone()
@@ -50,18 +51,18 @@ def get_all_users():
     all_users = cur.fetchall()
     return all_users
 
-@router.get('/{username}', response_model=schemas.UserOut)
-def get_user(username: str):
-    cur.execute("SELECT * FROM users WHERE username = %s;",(username,))
+@router.get('/{id}', response_model=schemas.UserOut)
+def get_user(id: int):
+    cur.execute("SELECT * FROM users WHERE user_id = %s;",(id,))
     user = cur.fetchone()
     return user
 
-@router.put('/{username}', response_model=schemas.UserOut)
-def update_user(user_cred: schemas.UserCreate, username :str):
+@router.put('/{id}', response_model=schemas.UserOut)
+def update_user(user_cred: schemas.UserCreate, id :int):
     if check_user(user_cred.username,user_cred.email):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email aldready taken")
     user_cred.password = utils.get_password_hash(user_cred.password)
-    cur.execute("UPDATE users SET name = %s, username = %s, email = %s, password = %s, role = %s WHERE username = %s RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,username,))
+    cur.execute("UPDATE users SET name = %s, username = %s, email = %s, password = %s, role = %s WHERE user_id = %s RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,id,))
     new_user = cur.fetchone()
     conn.commit()
     return new_user
