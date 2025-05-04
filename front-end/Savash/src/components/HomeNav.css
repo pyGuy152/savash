@@ -1,0 +1,52 @@
+
+.HomeNav .logo {
+    width: 40px;
+    height: 40px;
+}
+
+ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.HomeNav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    background-color: var(--navColor);
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    width: 100%;
+}
+
+.HomeNav .left{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 13px 20px;
+}
+
+.HomeNav .right{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 10px 20px;
+}
+
+.HomeNav a:has(.logo) {
+    height: 40px;
+}
+
+.HomeNav a{
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--textColor);
+}
+
+.HomeNav .register{
+    background-color: var(--submitColor);
+}

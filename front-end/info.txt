@@ -1,1 +1,1 @@
-This is the front-end powered by react
+This is the front-end powered by react + vite

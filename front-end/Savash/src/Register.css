@@ -1,0 +1,45 @@
+.Register {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--navColor);
+  max-width: 500px;
+  text-align: left;
+  margin: 40px auto;
+  padding: 70px 40px;
+  border-radius: 10px;
+}
+
+.Register label, .Register input {
+  margin-bottom: 5px;
+  font-size: 2rem;
+  color: var(--textColor);
+}
+
+.Register label {
+  margin-bottom: 0px;
+  font-weight: 500;
+}
+
+.Register input {
+  padding: 10px;
+  border-radius: 5px;
+  border: solid 3px #ccc;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.Register .submit {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.5rem;
+    background-color: var(--submitColor);
+}
+
+.Register h2{
+    font-size: 2.5rem;
+    line-height: 1rem;
+    margin-top: 0px;
+    margin-bottom: 50px;
+    text-align: center;
+}
