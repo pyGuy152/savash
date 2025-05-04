@@ -27,10 +27,8 @@ router = APIRouter(tags=['Auth'])
 
 @router.post("/login")
 def login(user_cred: schemas.LoginInput):
-    print(user_cred.email)
     cur.execute("SELECT * FROM users WHERE email = %s;",(user_cred.email,))
     hashed_pass = cur.fetchone()
-    print(hashed_pass)
     try:
         if utils.verify_password(user_cred.password,hashed_pass['password']): # type: ignore
             access_token = oauth2.create_access_token(data = {"user_id": hashed_pass['user_id']}) # type: ignore

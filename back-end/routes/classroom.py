@@ -1,7 +1,7 @@
 from pickletools import int4
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
-import psycopg2, os, time
+import psycopg2, os, time, random
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -27,6 +27,16 @@ while True:
 
 router = APIRouter(prefix='/class',tags=['Classes'])
 
-@router.get("/")
+@router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
+def make_class(class_data: schemas.ClassMake):
+    code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
+    cur.execute("INSERT INTO class (code, name) VALUES (%s,%s) RETURNING *;",(code,class_data.name,))
+    conn.commit()
+    new_class = cur.fetchone()
+    return new_class
+
+@router.get("/", response_model=List[schemas.ClassOut])
 def get_class():
-    return {'message':"welcome to da class"}
+    cur.execute("SELECT * FROM class;")
+    classes = cur.fetchall()
+    return classes
