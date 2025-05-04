@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, status, HTTPException
 import psycopg2, os, time
 from psycopg2 import Error
@@ -34,10 +35,16 @@ def check_user(username: str, email: str):
         return True
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
-def get_users(user_cred: schemas.UserCreate):
+def make_user(user_cred: schemas.UserCreate):
     if check_user(user_cred.username,user_cred.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")
     cur.execute("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     new_user = cur.fetchone()
     conn.commit()
     return new_user
+
+@router.get('/', response_model=List[schemas.UserOut])
+def get_user():
+    cur.execute("SELECT * FROM users;")
+    all_users = cur.fetchall()
+    return all_users
