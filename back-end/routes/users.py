@@ -44,7 +44,13 @@ def make_user(user_cred: schemas.UserCreate):
     return new_user
 
 @router.get('/', response_model=List[schemas.UserOut])
-def get_user():
+def get_all_users():
     cur.execute("SELECT * FROM users;")
     all_users = cur.fetchall()
     return all_users
+
+@router.get('/{username}', response_model=schemas.UserOut)
+def get_user(username: str):
+    cur.execute("SELECT * FROM users WHERE username = %s;",(username,))
+    user = cur.fetchone()
+    return user
