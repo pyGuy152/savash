@@ -29,7 +29,7 @@ router = APIRouter(tags=['Auth'])
 def login(user_cred: schemas.LoginInput):
     cur.execute("SELECT * FROM users WHERE email = %s;",(user_cred.email,))
     hashed_pass = cur.fetchone()
-    if utils.verify_password(user_cred.password,hashed_pass['password']):
+    if utils.verify_password(user_cred.password,hashed_pass['password']): # type: ignore
         return {'message':"logged in"}
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
