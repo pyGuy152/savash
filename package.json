@@ -1,0 +1,11 @@
+{
+  "name": "savash",
+  "version": "1.0.0",
+  "description": "Work in progress\r <hr>\r <h2>Links:</h2>\r <ul>\r   <li><a href=\"https://www.figma.com/design/QrCmmimRws11mmb3f3RB76/Savash\">Figma</li>\r </ul>\r <hr>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
