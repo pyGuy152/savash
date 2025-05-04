@@ -1,11 +1,12 @@
 from fastapi import APIRouter, status, HTTPException
 import psycopg2, os, time
+from psycopg2 import Error
 from dotenv import load_dotenv
 from .. import schemas
 
 load_dotenv()
-db_user = os.getenv("DB_USER")
-db_pass = os.getenv("DB_USER_PASS")
+db_user = os.getenv("DB_User")
+db_pass = os.getenv("DB_User_PASS")
 
 # connect and create a cursor for the db
 while True:
@@ -14,10 +15,10 @@ while True:
         cur = conn.cursor()
         print("connected to db")
         break
-    except:
+    except Error as e:
         if conn:
             conn.close()
-        print("Error connecting to DB")
+        print(f"Error connecting to DB: {e}")
         time.sleep(5)
 
 
@@ -31,7 +32,7 @@ def check_user(username: str, email: str):
     else:
         return True
 
-@router.post('/', status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def get_users(user_cred: schemas.UserCreate):
     if check_user(user_cred.username,user_cred.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email aldready taken")

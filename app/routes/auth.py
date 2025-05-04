@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 import os, time, psycopg2
+from psycopg2 import Error
 from dotenv import load_dotenv
 from .. import schemas
 
 load_dotenv()
-db_user = os.getenv("DB_USER")
-db_pass = os.getenv("DB_USER_PASS")
+db_user = os.getenv("DB_User")
+db_pass = os.getenv("DB_User_PASS")
 
 # connect and create a cursor for the db
 conn = None
@@ -16,10 +17,10 @@ while True:
         cur = conn.cursor()
         print("connected to db")
         break
-    except:
+    except Error as e:
         if conn:
             conn.close()
-        print("Error connecting to DB")
+        print(f"Error connecting to DB: {e}")
         time.sleep(5)
 
 
