@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 
 interface MessageListProps {
   messages: string[];

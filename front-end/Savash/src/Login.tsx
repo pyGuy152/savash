@@ -31,7 +31,7 @@ function Login() {
                 navigate("/dashboard");
               }
             })
-            .catch((err) => {
+            .catch(() => {
               LOGOUT();
             });
         }
