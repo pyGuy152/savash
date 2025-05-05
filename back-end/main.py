@@ -6,6 +6,7 @@ app = FastAPI()
 
 origins = [
     'https://savash.rohanjain.xyz',
+    'https://builds.rohanjain.xyz',
 ]
 
 app.add_middleware(

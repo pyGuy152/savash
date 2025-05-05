@@ -59,12 +59,15 @@ def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_cur
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     while checkCode(code):
         code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
-    cur.execute("INSERT INTO class (code, name) VALUES (%s,%s) RETURNING *;",(code,class_data.name,))
-    conn.commit()
-    new_class = cur.fetchone()
-    cur.execute("INSERT INTO user_class (user_id, code) VALUES (%s, %s);",(tokenData.id,code))
-    conn.commit()
-    return new_class
+    if verifyTeacher(tokenData.id):
+        cur.execute("INSERT INTO class (code, name) VALUES (%s,%s) RETURNING *;",(code,class_data.name,))
+        conn.commit()
+        new_class = cur.fetchone()
+        cur.execute("INSERT INTO user_class (user_id, code) VALUES (%s, %s);",(tokenData.id,code))
+        conn.commit()
+        return new_class
+    else:
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to create a class")
 
 @router.get("/", response_model=List[schemas.ClassOut])
 def get_class(tokenData = Depends(oauth2.get_current_user)):
