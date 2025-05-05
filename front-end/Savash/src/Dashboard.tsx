@@ -45,7 +45,7 @@ function Dashboard() {
         });
     }
 
-    useEffect(fetchClasses, []);
+    useEffect(fetchClasses);
 
     return (
         <>
