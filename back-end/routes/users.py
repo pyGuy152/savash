@@ -42,6 +42,8 @@ def make_user(user_cred: schemas.UserCreate):
     cur.execute("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     new_user = cur.fetchone()
     conn.commit()
+    if not new_user['join_req']: # type: ignore
+        new_user['join_req'] = [] # type: ignore
     return new_user
 
 @router.get('/', response_model=schemas.UserOut)
