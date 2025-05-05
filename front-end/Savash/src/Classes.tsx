@@ -24,7 +24,7 @@ function Classes() {
             }
         }).then((res) => res.json())
         .then((data) => {
-            if(data == null){
+            if (data == null || !data.name) {
                 return;
             }
             console.log(data)
