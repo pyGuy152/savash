@@ -23,6 +23,7 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     role: str
+    join_req: list
     class config:
         orm_mode = True
 
