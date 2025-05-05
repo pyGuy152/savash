@@ -40,3 +40,8 @@ class ClassOut(BaseModel):
     code: int
     name: str
     created_at : datetime
+
+class InviteUser(BaseModel):
+    email: EmailStr
+    code: int
+
