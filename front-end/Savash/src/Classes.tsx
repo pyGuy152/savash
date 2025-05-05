@@ -36,7 +36,7 @@ function Classes() {
             });
             setClasses(dateParsed);
         }).catch((err) => {
-            alert("Logging Out");
+             alert(err);
             LOGOUT();
             navigate("/");
             console.error(err);
