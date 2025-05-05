@@ -24,3 +24,7 @@ while True:
 
 
 router = APIRouter(prefix='/students',tags=['Students'])
+
+@router.get('/')
+def get_student():
+    return 
