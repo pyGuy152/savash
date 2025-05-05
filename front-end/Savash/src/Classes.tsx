@@ -24,8 +24,8 @@ function Classes() {
             }
         }).then((res) => res.json())
         .then((data) => {
-            if (data == null || !data.name) {
-                return;
+            if (data == null || !data[0]) {
+               return;
             }
             console.log(data)
             let dateParsed = data.map((classItem : Class) => {
