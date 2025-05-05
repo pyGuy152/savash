@@ -41,7 +41,6 @@ class ClassOut(BaseModel):
     name: str
     created_at : datetime
 
-class InviteUser(BaseModel):
+class ClassUsers(BaseModel):
     email: EmailStr
     code: int
-

@@ -41,6 +41,21 @@ def checkEmail(email):
     else:
         return False
 
+def getUserId(email):
+    cur.execute("SELECT * FROM users WHERE email = %s;",(str(email),))
+    user = cur.fetchone()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="not a valid email")
+    return user['user_id'] # type: ignore
+
+def verifyOwnerOf(id):
+    cur.execute("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
+    relation = cur.fetchone()
+    if relation:
+        return True
+    else:
+        return False
+
 @router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
@@ -60,15 +75,35 @@ def get_class(tokenData = Depends(oauth2.get_current_user)):
     return classes
 
 @router.post("/add")
-def add_student_to_class(inviteData:schemas.InviteUser, tokenData = Depends(oauth2.get_current_user)):
+def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(inviteData.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
+    if not verifyOwnerOf(tokenData.id):
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
     cur.execute("UPDATE users SET join_req = array_append(join_req, %s) WHERE email = %s RETURNING *;",(inviteData.code,inviteData.email))
     conn.commit()
     if cur.fetchone():
-        return {'message':'done!!!'}
+        return {'message':'invite sent!!!'}
     else:
         HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='No invites sent')
 
+@router.post("/remove")
+def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(removeData.code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not checkEmail(removeData.email):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
+    if not verifyOwnerOf(tokenData.id):
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove users from this class")
+    cur.execute("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(removeData.code,getUserId(removeData.email),))
+    removed = cur.fetchone()
+    conn.commit()
+    cur.execute("UPDATE users SET join_req = array_remove(join_req, %s) WHERE email = %s RETURNING *;",(removeData.code,removeData.email))
+    removed_1 = cur.fetchone()
+    conn.commit()
+    if not removed_1 and not removed:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Did not remove from class')
+    else:
+        return {"message":"Removed from class"}
