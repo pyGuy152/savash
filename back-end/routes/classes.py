@@ -54,13 +54,21 @@ def verifyTeacher(id):
     else:
         return False
 
+def verifyOwner(code,id):
+    cur.execute("SELECT * FROM class WHERE owner = %s AND code = %s;",(id,code,))
+    relation = cur.fetchone()
+    if relation:
+        return True
+    else:
+        return False
+
 @router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     while checkCode(code):
         code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     if verifyTeacher(tokenData.id):
-        cur.execute("INSERT INTO class (code, name) VALUES (%s,%s) RETURNING *;",(code,class_data.name,))
+        cur.execute("INSERT INTO class (code, name, owner) VALUES (%s,%s,%s) RETURNING *;",(code,class_data.name,tokenData.id,))
         conn.commit()
         new_class = cur.fetchone()
         cur.execute("INSERT INTO user_class (user_id, code) VALUES (%s, %s);",(tokenData.id,code))
@@ -81,7 +89,7 @@ def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oaut
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyTeacher(tokenData.id):
+    if not verifyOwner(inviteData.code,tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
     if int(getUserId(inviteData.email)) == int(tokenData.id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="User tried to add themself")
@@ -98,7 +106,7 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyTeacher(tokenData.id):
+    if not verifyOwner(removeData.code,tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove users from this class")
     cur.execute("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(removeData.code,getUserId(removeData.email),))
     removed = cur.fetchone()
@@ -113,7 +121,7 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
 
 @router.put('/')
 def update_class(data:schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
-    if verifyTeacher(tokenData.id):
+    if verifyOwner(data.code,tokenData.id):
         cur.execute("UPDATE class SET name = %s WHERE code = %s RETURNING *;",(data.name,data.code,))
         updated_class = cur.fetchone()
         conn.commit()
@@ -124,7 +132,7 @@ def update_class(data:schemas.UpdateClass,tokenData = Depends(oauth2.get_current
 
 @router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
 def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
-    if verifyTeacher(tokenData.id):
+    if verifyOwner(data.code,tokenData.id):
         cur.execute("DELETE FROM class WHERE code = %s RETURNING *;",(data.code,))
         deleted_class = cur.fetchone()
         conn.commit()
