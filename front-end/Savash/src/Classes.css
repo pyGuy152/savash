@@ -1,0 +1,48 @@
+
+h1{
+    padding: 10px 20px;
+}
+
+.class-container {
+    display: flex;
+    gap: 20px;
+    margin: 30px;
+    flex-wrap: wrap;
+}
+
+.class {
+    border-radius: 20px;
+    background-color: var(--navColor);
+    padding: 0px 30px;
+    height: 150px;
+    background: linear-gradient(to bottom right, var(--navColor), var(--tint));
+    box-shadow: 0em 1em 2em #3333332c;
+    transition: background-size 0.3s;
+    background-size: 200% 200%;
+}
+
+.class:hover{
+    background-size: 100% 100%;
+}
+
+.class .header{
+    display: flex;
+    align-items: center;
+}
+
+.class hr{
+    min-width: 20px;
+    margin: 10px 10px;
+}
+
+a {
+    color: var(--textColor);
+    text-decoration: none;
+}
+
+.class .code {
+    color: var(--submitColor);
+    font-size: 2rem;
+    letter-spacing: 0.1rem;
+    margin: 5px 0px;
+}

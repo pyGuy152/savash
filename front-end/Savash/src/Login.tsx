@@ -6,39 +6,34 @@ import { useNavigate } from "react-router-dom";
 
 const apiUrl = "https://api.codewasabi.xyz";
 
+import { LOGOUT, getToken } from "./types.ts";
+
 function Login() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        let token = document.cookie.split("; ").find(row => row.startsWith("token="));
-        if(!token) {
-            return;
-        }
-        token = token.substring(6);
-        if (token) {
-            fetch(apiUrl + "/users", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "bearer " + token,
-              },
+        
+        if (getToken(document.cookie)) {
+          fetch(apiUrl + "/users", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "bearer " + getToken(document.cookie),
+            },
+          })
+            .then((res) => res.json())
+            .then((user) => {
+              localStorage.setItem("role", user.role);
+              localStorage.setItem("username", user.username);
+              if (user.role === "teacher") {
+                navigate("/classes");
+              } else {
+                navigate("/dashboard");
+              }
             })
-              .then((res) => res.json())
-              .then((user) => {
-                localStorage.setItem("role", user.role);
-                localStorage.setItem("username", user.username);
-                if (user.role === "teacher") {
-                  navigate("/classes");
-                } else {
-                  navigate("/dashboard");
-                }
-              })
-              .catch((err) => {
-                localStorage.removeItem("role");
-                localStorage.removeItem("username");
-                document.cookie =
-                  "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-              });
+            .catch((err) => {
+              LOGOUT();
+            });
         }
     }, []);
 
@@ -55,6 +50,7 @@ function Login() {
           .then((user) => {
             localStorage.setItem("role", user.role);
             localStorage.setItem("username", user.username);
+            localStorage.setItem("email", user.email)
             if (user.role === "teacher") {
               navigate("/classes");
             } else {

@@ -22,6 +22,7 @@
   --textColor: #000000;
   --navColor: #F4EEEE;
   --submitColor: #5BB861;
+  --tint: #e6e6ca;
 }
 
 body {
@@ -36,7 +37,7 @@ body {
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #0d149bec);
+  filter: drop-shadow(0 0 1em #0d149bec);
 }
 
 h1 {

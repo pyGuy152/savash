@@ -50,3 +50,12 @@ ul{
 .HomeNav .register{
     background-color: var(--submitColor);
 }
+
+.HomeNav img{
+    width: 2rem;
+}
+
+.HomeNav a {
+    display: flex;
+    align-items: center;
+}

@@ -73,7 +73,6 @@ function Register() {
             required
             pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
           />
-          <br />
           <label htmlFor="password">Password:</label>
           <input type="password" name="password" id="password" required />
           <br />
