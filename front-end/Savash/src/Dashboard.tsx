@@ -25,9 +25,9 @@ function Dashboard() {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data == null || !data[0]) {
-            return;
-          }
+          if (data == null || !data[0].name) {
+               return;
+            }
           console.log(data);
           let dateParsed = data.map((classItem: Class) => {
             return {
