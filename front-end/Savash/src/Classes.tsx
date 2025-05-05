@@ -43,7 +43,7 @@ function Classes() {
         });
     }
 
-    useEffect(fetchClasses, []);
+    useEffect(fetchClasses);
 
     return (
       <>
