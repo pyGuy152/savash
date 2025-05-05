@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 from enum import Enum
+from datetime import datetime
 
 class LoginInput(BaseModel):
     email: str
@@ -22,6 +23,7 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     role: str
+    join_req: list
     class config:
         orm_mode = True
 
@@ -31,3 +33,25 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+class ClassMake(BaseModel):
+    name: str
+
+class ClassOut(BaseModel):
+    code: int
+    name: str
+    created_at : datetime
+
+class ClassUsers(BaseModel):
+    email: EmailStr
+    code: int
+
+class DelClass(BaseModel):
+    code: int
+
+class UpdateClass(BaseModel):
+    code: int
+    name: str
+
+class JoinClass(BaseModel):
+    code: int

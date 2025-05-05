@@ -16,7 +16,6 @@ while True:
     try:
         conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
         cur = conn.cursor()
-        print("connected to db")
         break
     except Error as e:
         if conn:
@@ -43,12 +42,16 @@ def make_user(user_cred: schemas.UserCreate):
     cur.execute("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     new_user = cur.fetchone()
     conn.commit()
+    if not new_user['join_req']: # type: ignore
+        new_user['join_req'] = [] # type: ignore
     return new_user
 
 @router.get('/', response_model=schemas.UserOut)
 def get_user(tokenData = Depends(oauth2.get_current_user)):
     cur.execute("SELECT * FROM users WHERE user_id = %s;",(tokenData.id,))
     user = cur.fetchone()
+    if not user['join_req']: # type: ignore
+        user['join_req'] = [] # type: ignore
     return user
 
 @router.put('/', response_model=schemas.UserOut)
@@ -60,3 +63,11 @@ def update_user(user_cred: schemas.UserCreate, tokenData = Depends(oauth2.get_cu
     new_user = cur.fetchone()
     conn.commit()
     return new_user
+
+@router.delete('/',status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(tokenData = Depends(oauth2.get_current_user)):
+    cur.execute("DELETE FROM users WHERE user_id = %s RETURNING *;", (tokenData.id,))
+    del_user = cur.fetchone()
+    conn.commit()
+    if not del_user:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No user deleted")
