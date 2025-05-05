@@ -37,21 +37,20 @@ class TokenData(BaseModel):
 class ClassMake(BaseModel):
     name: str
 
-class ClassOut(BaseModel):
+class ClassBase(BaseModel):
     code: int
+class ClassOut(ClassBase):
     name: str
     created_at : datetime
 
-class ClassUsers(BaseModel):
+class ClassUsers(ClassBase):
     email: EmailStr
-    code: int
 
-class DelClass(BaseModel):
-    code: int
+class DelClass(ClassBase):
+    pass
 
-class UpdateClass(BaseModel):
-    code: int
+class UpdateClass(ClassBase):
     name: str
 
-class JoinClass(BaseModel):
-    code: int
+class JoinClass(ClassBase):
+    pass
