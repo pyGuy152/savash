@@ -71,7 +71,7 @@ def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_cur
 
 @router.get("/", response_model=List[schemas.ClassOut])
 def get_class(tokenData = Depends(oauth2.get_current_user)):
-    cur.execute("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s AND u.role = 'teacher';",(tokenData.id,))
+    cur.execute("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s;",(tokenData.id,))
     classes = cur.fetchall()
     return classes
 

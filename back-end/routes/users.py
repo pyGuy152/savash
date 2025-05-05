@@ -50,8 +50,10 @@ def make_user(user_cred: schemas.UserCreate):
 def get_user(tokenData = Depends(oauth2.get_current_user)):
     cur.execute("SELECT * FROM users WHERE user_id = %s;",(tokenData.id,))
     user = cur.fetchone()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Try loging in again')
     if not user['join_req']: # type: ignore
-        user['join_req'] = [] # type: ignore
+        user['join_req'] = []  # type: ignore
     return user
 
 @router.put('/', response_model=schemas.UserOut)
