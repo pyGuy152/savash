@@ -48,7 +48,7 @@ def getUserId(email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="not a valid email")
     return user['user_id'] # type: ignore
 
-def verifyOwnerOf(id):
+def verifyTeacher(id):
     cur.execute("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
     relation = cur.fetchone()
     if relation:
@@ -80,7 +80,7 @@ def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oaut
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwnerOf(tokenData.id):
+    if not verifyTeacher(tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
     cur.execute("UPDATE users SET join_req = array_append(join_req, %s) WHERE email = %s RETURNING *;",(inviteData.code,inviteData.email))
     conn.commit()
@@ -95,7 +95,7 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwnerOf(tokenData.id):
+    if not verifyTeacher(tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove users from this class")
     cur.execute("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(removeData.code,getUserId(removeData.email),))
     removed = cur.fetchone()
@@ -107,3 +107,14 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Did not remove from class')
     else:
         return {"message":"Removed from class"}
+
+@router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
+    if verifyTeacher(tokenData.id):
+        cur.execute("DELETE FROM class WHERE code = %s RETURNING *;",(data.code,))
+        deleted_class = cur.fetchone()
+        conn.commit()
+        if not deleted_class:
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Could not delete class')
+    else:
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to delete this class")

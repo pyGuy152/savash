@@ -44,3 +44,6 @@ class ClassOut(BaseModel):
 class ClassUsers(BaseModel):
     email: EmailStr
     code: int
+
+class DelClass(BaseModel):
+    code: int
