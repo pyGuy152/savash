@@ -83,6 +83,8 @@ def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oaut
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
+    if int(getUserId(inviteData.email)) == int(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="User tried to add themself")
     cur.execute("UPDATE users SET join_req = array_append(join_req, %s) WHERE email = %s RETURNING *;",(inviteData.code,inviteData.email))
     conn.commit()
     if cur.fetchone():
