@@ -25,7 +25,7 @@ function Dashboard() {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data == null || !data.name) {
+          if (data == null || !data[0]) {
             return;
           }
           console.log(data);
