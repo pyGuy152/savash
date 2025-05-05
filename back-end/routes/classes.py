@@ -127,3 +127,13 @@ def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_us
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Could not delete class')
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to delete this class")
+
+@router.post('/join')
+def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
+    if not verifyTeacher(tokenData.id):
+        cur.execute("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,data.code,))
+        relation = cur.fetchone()
+        conn.commit()
+        return relation
+    else:
+        raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="nuh uh")

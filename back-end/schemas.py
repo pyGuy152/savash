@@ -52,3 +52,6 @@ class DelClass(BaseModel):
 class UpdateClass(BaseModel):
     code: int
     name: str
+
+class JoinClass(BaseModel):
+    code: int
