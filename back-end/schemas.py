@@ -47,3 +47,7 @@ class ClassUsers(BaseModel):
 
 class DelClass(BaseModel):
     code: int
+
+class UpdateClass(BaseModel):
+    code: int
+    name: str

@@ -108,6 +108,17 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
     else:
         return {"message":"Removed from class"}
 
+@router.put('/')
+def update_class(data:schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
+    if verifyTeacher(tokenData.id):
+        cur.execute("UPDATE class SET name = %s WHERE code = %s RETURNING *;",(data.name,data.code,))
+        updated_class = cur.fetchone()
+        conn.commit()
+        if not updated_class:
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Could not update class')
+    else:
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to update this class")
+
 @router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
 def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
     if verifyTeacher(tokenData.id):
