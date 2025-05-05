@@ -150,3 +150,4 @@ def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current
         return relation
     else:
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="nuh uh")
+
