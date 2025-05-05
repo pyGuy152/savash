@@ -16,7 +16,6 @@ while True:
     try:
         conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
         cur = conn.cursor()
-        print("connected to db")
         break
     except Error as e:
         if conn:
