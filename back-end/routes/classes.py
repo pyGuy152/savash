@@ -1,3 +1,4 @@
+from email.policy import HTTP
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
 import psycopg2, os, time, random
@@ -165,3 +166,11 @@ def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current
     else:
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="nuh uh")
 
+@router.get("/{code}")
+def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
+    if verifyOwner(code,tokenData.id):
+        cur.execute("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s AND u.role = 'teacher' AND uc.code = %s;",(tokenData.id,code,))
+        class_out = cur.fetchone()
+        return class_out
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You cannot acsess this info')
