@@ -144,6 +144,8 @@ def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_us
 
 @router.post('/join')
 def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(data.code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         cur.execute("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,data.code,))
         relation = cur.fetchone()
