@@ -62,6 +62,14 @@ def verifyOwner(code,id):
     else:
         return False
 
+def checkIfInvitedT(code,id):
+    cur.execute("SELECT * FROM users WHERE %s = ANY(join_req) AND user_id = %s AND role = 'teacher';", (code,id,))
+    invite_status = cur.fetchone()
+    if invite_status:
+        return True
+    else:
+        return False
+
 @router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
@@ -146,9 +154,12 @@ def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_us
 def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(data.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-    if not verifyTeacher(tokenData.id):
+    if not verifyTeacher(tokenData.id) or checkIfInvitedT(data.code,tokenData.id):
         cur.execute("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,data.code,))
         relation = cur.fetchone()
+        conn.commit()
+        cur.execute("UPDATE users SET join_req = array_remove(join_req, %s) WHERE user_id = %s RETURNING *;",(data.code,tokenData.id))
+        removed_invite = cur.fetchone()
         conn.commit()
         return relation
     else:
