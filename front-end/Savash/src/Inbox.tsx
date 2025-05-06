@@ -1,32 +1,56 @@
 
 import "./Inbox.css";
-import MessageList from "./MessageList";
+import MessageList from "./components/MessageList";
 
 import StudentNav from "./components/StudentNav"
+import TeacherNav from "./components/TeacherNav";
 
 import { useState, useEffect } from "react";
+import { getToken } from "./types.ts";
+
+let apiUrl = "https://api.codewasabi.xyz"
 
 function Inbox() {
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState<string[]>(["Loading"]);
 
     function loadMessages() {
-        let messagesLocal = localStorage.getItem("join_req");
-        if(!messagesLocal){
-
-            return;
+      fetch(apiUrl + "/users", {
+        method: "GET",
+        headers: {
+          Authorization: "bearer " + getToken(document.cookie)
         }
-        let messageData = JSON.parse(messagesLocal);
-        setMessages(messageData);
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(!data || data.join_req.length == 0){
+          setMessages([]);
+          return;
+        }
+        console.log(data)
+        setMessages(data.join_req);
+      })
     }
 
-    useEffect(loadMessages);
+    useEffect(loadMessages, []);
 
-    return (
-    <>
-        <StudentNav />
-        <MessageList messages={messages}/>
-    </>
-    )
+    if(localStorage.getItem("role") == 'teacher'){
+        return (
+          <>
+            <TeacherNav />
+            <MessageList messages={messages} />
+          </>
+        );
+    }
+    else{
+        return (
+          <>
+            <StudentNav />
+            <MessageList messages={messages} />
+          </>
+        );
+    }
+
+    
 }
 
 export default Inbox;

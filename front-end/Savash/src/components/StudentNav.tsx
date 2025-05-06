@@ -3,12 +3,24 @@
 
 import "./HomeNav.css";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-function TeacherNav() {
+import { LOGOUT } from "../types.ts"
+
+function StudentNav() {
+  const navigate = useNavigate();
+
+  function handleLogout(){
+    LOGOUT();
+    navigate("/");
+  }
+
   return (
     <nav className="HomeNav">
       <ul className="left">
+        <li>
+          <p onClick={handleLogout}>Logout</p>
+        </li>
         <li>
           <Link to="/contact">Contact</Link>
         </li>
@@ -35,4 +47,4 @@ function TeacherNav() {
   );
 }
 
-export default TeacherNav;
+export default StudentNav;

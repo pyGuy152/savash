@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
+import { getToken } from "./types.ts"
+
 function CreateClass() {
     const navigate = useNavigate();
 
@@ -25,6 +27,7 @@ function CreateClass() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "bearer " + getToken(document.cookie)
         },
       }).then(() => {
         navigate("/classes");

@@ -50,7 +50,7 @@ function Login() {
           .then((user) => {
             localStorage.setItem("role", user.role);
             localStorage.setItem("username", user.username);
-            localStorage.setItem("email", user.email)
+            localStorage.setItem("email", user.email);
             if (user.role === "teacher") {
               navigate("/classes");
             } else {

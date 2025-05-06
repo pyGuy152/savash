@@ -22,7 +22,7 @@
   --textColor: #000000;
   --navColor: #F4EEEE;
   --submitColor: #5BB861;
-  --tint: #e6e6ca;
+  --tint: #dfdfa2;
 }
 
 body {
@@ -54,4 +54,5 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
+  color: var(--textColor)
 }

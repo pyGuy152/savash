@@ -17,7 +17,7 @@
 }
 
 .Register label {
-  margin-bottom: 0px;
+  margin: 0px 10px 0px 0px;
   font-weight: 500;
 }
 
@@ -29,12 +29,17 @@
   margin-bottom: 20px;
 }
 
-.Register .submit {
+.Register .submit, .Register .close {
     width: 100%;
     padding: 10px;
     font-size: 1.5rem;
     background-color: var(--submitColor);
     margin: 20px 0px;
+}
+
+.Register .close {
+  background-color: #ccc;
+  margin: 0px 0px;
 }
 
 .Register h2{

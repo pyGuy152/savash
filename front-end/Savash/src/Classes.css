@@ -21,6 +21,22 @@ h1{
     background-size: 200% 200%;
 }
 
+.class.loading {
+    background: rgba(95, 98, 99, 0.404);
+}
+
+@keyframes load{
+    from{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0.6;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
 .class:hover{
     background-size: 100% 100%;
 }
@@ -45,4 +61,8 @@ a {
     font-size: 2rem;
     letter-spacing: 0.1rem;
     margin: 5px 0px;
+}
+
+.submit {
+    background-color: var(--submitColor);
 }

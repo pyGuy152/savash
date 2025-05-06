@@ -22,29 +22,26 @@ ul{
     width: 100%;
 }
 
-.HomeNav .left{
+.HomeNav .left, .HomeNav .center, .HomeNav .right{
     display: flex;
     align-items: center;
     gap: 30px;
     margin: 13px 20px;
 }
 
-.HomeNav .right{
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin: 10px 20px;
-}
-
 .HomeNav a:has(.logo) {
     height: 40px;
 }
 
-.HomeNav a{
+.HomeNav li{
     text-decoration: none;
     font-size: 1.2em;
     font-weight: 500;
     color: var(--textColor);
+}
+
+.HomeNav p{
+    cursor: pointer;
 }
 
 .HomeNav .register{
@@ -58,4 +55,13 @@ ul{
 .HomeNav a {
     display: flex;
     align-items: center;
+}
+
+.HomeNav .rotate-90deg {
+    rotate: -90deg;
+}
+
+.HomeNav p{
+    margin: 0;
+    
 }

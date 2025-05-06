@@ -1,20 +1,22 @@
+import ClassList from "./components/ClassList.tsx";
+import StudentNav from "./components/StudentNav";
 
-import ClassList from "./ClassList";
-import StudentNav from "./components/StudentNav"
-
-import { Class, getToken, LOGOUT } from "./types.ts"
-import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom"
+import { Class, getToken, LOGOUT } from "./types.ts";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const apiUrl = "https://api.codewasabi.xyz";
 
-import "./Dashboard.css"
+import "./Dashboard.css";
 
 function Dashboard() {
-
-    let [classes, setClasses] = useState<Class[]>([]);
+  let [classes, setClasses] = useState<Class[]>([{
+      name: "Loading",
+      code: 0,
+      created_at: new Date()
+    }]);
     const navigate = useNavigate();
-
+  
     function fetchClasses() {
       fetch(apiUrl + "/classes", {
         method: "GET",
@@ -25,9 +27,10 @@ function Dashboard() {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data == null || !data[0].name) {
-               return;
-            }
+          if (!data || data.length == 0) {
+            setClasses([]);
+            return;
+          }
           console.log(data);
           let dateParsed = data.map((classItem: Class) => {
             return {
@@ -44,16 +47,16 @@ function Dashboard() {
           console.error(err);
         });
     }
+    
+  useEffect(fetchClasses, []);
 
-    useEffect(fetchClasses);
-
-    return (
-        <>
-        <StudentNav />
-        <h1>Dashboard</h1>
-        <ClassList classes={classes}/>
-        </>
-    )
+  return (
+    <>
+      <StudentNav />
+      <h1>Dashboard</h1>
+      <ClassList classes={classes} />
+    </>
+  );
 }
 
 export default Dashboard;

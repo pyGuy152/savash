@@ -1,0 +1,11 @@
+
+.inviteDialog {
+    background: none;
+    border: none;
+}
+
+
+.inviteDialog::backdrop{
+    background-color: black;
+    opacity: 0.3;
+}
