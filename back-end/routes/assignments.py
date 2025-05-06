@@ -101,4 +101,4 @@ def delete_assignment(data:schemas.DeleteAssignment,tokenData = Depends(oauth2.g
     conn.commit()
     if not del_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No assignments were deleted")
-    
+
