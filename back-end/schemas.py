@@ -60,3 +60,9 @@ class AssignmentOut(BaseModel):
     description: str
     due_date: datetime
     created_at: datetime
+
+class MakeAssignment(BaseModel):
+    code: int
+    title: str
+    description: str
+    due_date: datetime

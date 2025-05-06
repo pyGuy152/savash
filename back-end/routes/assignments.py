@@ -49,8 +49,15 @@ def get_assignments(data:schemas.ClassBase,tokenData = Depends(oauth2.get_curren
     assignments = cur.fetchall()
     return assignments
 
-@router.post("/", response_model=schemas.AssignmentOut)
-def create_assignment(data:schemas.ClassBase,tokenData = Depends(oauth2.get_current_user)):
+@router.post("/", response_model=schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
+def create_assignment(data:schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
-    
+    if not userInClass(tokenData.id,data.code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    cur.execute("INSERT INTO assignments (code, title, description, due_date) VALUES (%s,%s,%s,%s) RETURNING *;",(data.code,data.title,data.description,data.due_date))
+    new_assignment = cur.fetchone()
+    conn.commit()
+    if not new_assignment:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
+    return new_assignment
