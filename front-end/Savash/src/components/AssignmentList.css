@@ -1,0 +1,16 @@
+.assignment-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.assignment-list .row{
+    border: 2px white solid;
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.noAssignments {
+    margin: 10px 20px;
+}

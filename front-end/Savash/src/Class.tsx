@@ -5,7 +5,7 @@ import ClassNav from "./components/ClassNav";
 
 const apiUrl = "https://api.codewasabi.xyz";
 
-import { Class, getToken, LOGOUT } from "./types.ts"
+import { Assignment, Class, getToken, LOGOUT } from "./types.ts"
 import { useEffect, useRef, useState } from "react";
 
 import "./Register.css";
@@ -13,9 +13,13 @@ import InviteModal from "./components/InviteModal.tsx";
 
 import "./Class.css"
 
+import AssignmentList from "./components/AssignmentList.tsx"
+
 function ClassComponent(){
     const navigate = useNavigate();
     const invite = useRef<HTMLDialogElement | null>(null);
+
+    const [assignments, setAssignments] = useState<Assignment[]>([]);
 
     const classID = Number(useParams().id);
     const [classData, setClassData] = useState<Class>({
@@ -64,7 +68,32 @@ function ClassComponent(){
           });
       }
 
+      function fetchAssignments() {
+        fetch(apiUrl + "/classes/assignments", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "bearer " + getToken(document.cookie),
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data || !Array.isArray(data)) {
+              return;
+            }
+            console.log(data);
+            setAssignments(data);
+          })
+          .catch((err) => {
+            alert(err);
+            LOGOUT();
+            navigate("/");
+            console.error(err);
+          });
+      }
+
     useEffect(fetchClasses, []);
+    useEffect(fetchAssignments, []);
 
     function inviteModalToggle() {
         if(invite){
@@ -87,7 +116,9 @@ function ClassComponent(){
           classSelected={classData}
           inviteModalToggle={inviteModalToggle}
         />
-        <h1>{classID}</h1>
+        <main>
+          <AssignmentList list={assignments} />
+        </main>
       </>
     );
 }

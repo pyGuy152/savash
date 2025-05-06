@@ -24,3 +24,11 @@ export function getToken(cookie : string) {
       return "";
     }
 }
+
+export interface Assignment {
+  assignment_id : Number;
+  title : string,
+  description : string,
+  due_date : Date,
+  created_at : Date
+}
