@@ -70,3 +70,6 @@ class MakeAssignment(BaseModel):
 
 class UpdateAssignment(MakeAssignment):
     assignment_id: int
+
+class DeleteAssignment(ClassBase):
+    assignment_id: int
