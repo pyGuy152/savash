@@ -37,21 +37,39 @@ class TokenData(BaseModel):
 class ClassMake(BaseModel):
     name: str
 
-class ClassOut(BaseModel):
+class ClassBase(BaseModel):
     code: int
+class ClassOut(ClassBase):
     name: str
     created_at : datetime
 
-class ClassUsers(BaseModel):
+class ClassUsers(ClassBase):
     email: EmailStr
-    code: int
 
-class DelClass(BaseModel):
-    code: int
+class DelClass(ClassBase):
+    pass
 
-class UpdateClass(BaseModel):
-    code: int
+class UpdateClass(ClassBase):
     name: str
 
-class JoinClass(BaseModel):
+class JoinClass(ClassBase):
+    pass
+
+class AssignmentOut(BaseModel):
+    assignment_id: int
+    title: str
+    description: str
+    due_date: datetime
+    created_at: datetime
+
+class MakeAssignment(BaseModel):
     code: int
+    title: str
+    description: str
+    due_date: datetime
+
+class UpdateAssignment(MakeAssignment):
+    assignment_id: int
+
+class DeleteAssignment(ClassBase):
+    assignment_id: int
