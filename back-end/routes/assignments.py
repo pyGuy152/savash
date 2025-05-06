@@ -66,7 +66,22 @@ def create_assignment(data:schemas.MakeAssignment,tokenData = Depends(oauth2.get
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,data.code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    cur.execute("INSERT INTO assignments (code, title, description, due_date) VALUES (%s,%s,%s,%s) RETURNING *;",(data.code,data.title,data.description,data.due_date))
+    cur.execute("INSERT INTO assignments (code, title, description, due_date) VALUES (%s,%s,%s,%s) RETURNING *;",(data.code,data.title,data.description,data.due_date,))
+    new_assignment = cur.fetchone()
+    conn.commit()
+    if not new_assignment:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
+    return new_assignment
+
+@router.put("/", response_model=schemas.AssignmentOut)
+def update_assignment(data:schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(data.code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
+    if not userInClass(tokenData.id,data.code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    cur.execute("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s WHERE assignment_id = %s RETURNING *;",(data.code,data.title,data.description,data.due_date,data.assignment_id,))
     new_assignment = cur.fetchone()
     conn.commit()
     if not new_assignment:

@@ -56,6 +56,7 @@ class JoinClass(ClassBase):
     pass
 
 class AssignmentOut(BaseModel):
+    assignment_id: int
     title: str
     description: str
     due_date: datetime
@@ -66,3 +67,6 @@ class MakeAssignment(BaseModel):
     title: str
     description: str
     due_date: datetime
+
+class UpdateAssignment(MakeAssignment):
+    assignment_id: int
