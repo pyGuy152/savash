@@ -60,7 +60,6 @@ def get_assignments(data:schemas.ClassBase,tokenData = Depends(oauth2.get_curren
 
 @router.post("/", response_model=schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_assignment(data:schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
-    print(tokenData.id)
     if not checkCode(data.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
