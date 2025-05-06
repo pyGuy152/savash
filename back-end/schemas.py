@@ -54,3 +54,9 @@ class UpdateClass(ClassBase):
 
 class JoinClass(ClassBase):
     pass
+
+class AssignmentOut(BaseModel):
+    title: str
+    description: str
+    due_date: datetime
+    created_at: datetime

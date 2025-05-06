@@ -23,8 +23,34 @@ while True:
         time.sleep(5)
 
 
-router = APIRouter(prefix='/assignments',tags=['Assignments'])
+router = APIRouter(prefix='/classes/assignments',tags=['Assignments'])
 
-@router.get("/")
-def get_assignments():
-    return {'message':'IT WORKS'}
+def verifyTeacher(id):
+    cur.execute("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
+    relation = cur.fetchone()
+    if relation:
+        return True
+    else:
+        return False
+
+def userInClass(id,code):
+    cur.execute("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
+    relation = cur.fetchone()
+    if relation:
+        return True
+    else:
+        return False
+
+@router.get("/", response_model=List[schemas.AssignmentOut])
+def get_assignments(data:schemas.ClassBase,tokenData = Depends(oauth2.get_current_user)):
+    if not userInClass(tokenData.id,data.code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    cur.execute("SELECT * FORM assignments WHERE code = %s;",(data.code,))
+    assignments = cur.fetchall()
+    return assignments
+
+@router.post("/", response_model=schemas.AssignmentOut)
+def create_assignment(data:schemas.ClassBase,tokenData = Depends(oauth2.get_current_user)):
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
+    
