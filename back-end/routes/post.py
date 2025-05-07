@@ -30,3 +30,6 @@ router = APIRouter(prefix="/messages",tags=['Messages'])
 def get_post():
     return {'messages':'wasup'}
 
+@router.post("/")
+def add_post(thing: schemas.AddPost):
+    return {'nuh uh':" nuh uh"}
