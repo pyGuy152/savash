@@ -48,13 +48,13 @@ def checkCode(code):
     else:
         return False
 
-@router.get("/", response_model=List[schemas.AssignmentOut])
-def get_assignments(data:schemas.ClassBase,tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(data.code):
+@router.get("/{code}", response_model=List[schemas.AssignmentOut])
+def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-    if not userInClass(tokenData.id,data.code):
+    if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    cur.execute("SELECT * FROM assignments WHERE code = %s;",(data.code,))
+    cur.execute("SELECT * FROM assignments WHERE code = %s;",(code,))
     assignments = cur.fetchall()
     return assignments
 
