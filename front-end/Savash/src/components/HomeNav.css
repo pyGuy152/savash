@@ -65,3 +65,7 @@ ul{
     margin: 0;
     
 }
+
+.HomeNav .gray {
+    background-color: var(--midColor);
+}

@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 
 
 export interface Class {
@@ -31,4 +32,9 @@ export interface Assignment {
   description : string,
   due_date : Date,
   created_at : Date
+}
+
+export interface Tab {
+  title : string,
+  element : ReactElement
 }

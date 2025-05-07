@@ -108,10 +108,18 @@ function Login() {
           <form className="Register" onSubmit={submitForm}>
             <h2>Login</h2>
             <label htmlFor="email">Email:</label>
-            <input type="email" id="email" name="email" required />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+              required
+            />
             <label htmlFor="password">Password:</label>
             <input type="password" id="password" name="password" required />
-            <button type="submit" className="submit">Login</button>
+            <button type="submit" className="submit">
+              Login
+            </button>
           </form>
         </div>
       </>

@@ -23,6 +23,8 @@
   --navColor: #F4EEEE;
   --submitColor: #5BB861;
   --tint: #dfdfa2;
+  --tabBackgroundColor: rgb(204, 204, 181);
+  --midColor: rgb(185, 185, 185);
 }
 
 body {

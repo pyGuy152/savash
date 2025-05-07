@@ -5,7 +5,7 @@ import ClassNav from "./components/ClassNav";
 
 const apiUrl = "https://api.codewasabi.xyz";
 
-import { Assignment, Class, getToken, LOGOUT } from "./types.ts"
+import { Assignment, Class, getToken, LOGOUT, Tab } from "./types.ts"
 import { useEffect, useRef, useState } from "react";
 
 import "./Register.css";
@@ -14,6 +14,7 @@ import InviteModal from "./components/InviteModal.tsx";
 import "./Class.css"
 
 import AssignmentList from "./components/AssignmentList.tsx"
+import Tabs from "./components/Tabs.tsx";
 
 function ClassComponent(){
     const navigate = useNavigate();
@@ -75,6 +76,9 @@ function ClassComponent(){
             "Content-Type": "application/json",
             Authorization: "bearer " + getToken(document.cookie),
           },
+          body: JSON.stringify({
+            code: classID
+          }),
         })
           .then((res) => res.json())
           .then((data) => {
@@ -107,6 +111,16 @@ function ClassComponent(){
         }
     }
 
+    const tabList : Tab[] = [{
+      title: "Assignments",
+      element: <AssignmentList list={assignments} />
+    },
+    {
+      title: "People",
+      element: <h1>Many people</h1>
+    }
+    ];
+
     return (
       <>
         <dialog className="inviteDialog" ref={invite}>
@@ -117,7 +131,7 @@ function ClassComponent(){
           inviteModalToggle={inviteModalToggle}
         />
         <main>
-          <AssignmentList list={assignments} />
+          <Tabs options={tabList}/>
         </main>
       </>
     );

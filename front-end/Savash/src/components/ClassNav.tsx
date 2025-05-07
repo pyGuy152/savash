@@ -25,7 +25,14 @@ function ClassNav({ classSelected, inviteModalToggle }: ClassNavProps) {
       </ul>
       <ul className="right">
         <li>
-          <button onClick={inviteModalToggle} className="register">Invite</button>
+          <Link to="./add">
+            <button className="register gray">Add Assignment</button>
+          </Link>
+        </li>
+        <li>
+          <button onClick={inviteModalToggle} className="register">
+            Invite
+          </button>
         </li>
       </ul>
     </nav>

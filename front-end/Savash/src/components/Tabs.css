@@ -1,0 +1,33 @@
+
+.tab-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--navColor);
+    margin: 20px;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.tab-selector {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.tab {
+    padding: 10px;
+    background-color: var(--backgroundColor);
+    border-radius: 15px 15px 0 0;
+    cursor: pointer;
+}
+
+.tab.selected {
+    background-color: var(--tabBackgroundColor);
+}
+
+.tab-content {
+    background-color: var(--tabBackgroundColor);
+    min-height: 500px;
+    border-radius: 15px;;
+}

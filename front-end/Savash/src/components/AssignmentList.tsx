@@ -17,7 +17,7 @@ function AssignmentList({ list }:AssignmentListProps) {
             {
                 list.map(row => (
                     <li className="row">
-                        <img src="icons/paperclip.png"></img>
+                        <img src="/icons/paperclip.png"></img>
                         <p>{row.title}</p>
                         <p>{row.due_date.toLocaleDateString()}</p>
                     </li>
