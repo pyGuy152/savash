@@ -73,3 +73,8 @@ class UpdateAssignment(MakeAssignment):
 
 class DeleteAssignment(ClassBase):
     assignment_id: int
+
+class AddPost(BaseModel):
+    tile : str
+    description: str
+
