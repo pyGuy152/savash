@@ -71,6 +71,14 @@ def checkIfInvitedT(code,id):
     else:
         return False
 
+def userInClass(id,code):
+    cur.execute("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
+    relation = cur.fetchone()
+    if relation:
+        return True
+    else:
+        return False
+
 @router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
@@ -168,7 +176,9 @@ def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current
 
 @router.get("/{code}")
 def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
-    if verifyOwner(code,tokenData.id):
+    if not checkCode(code):
+        raise 
+    if userInClass(tokenData.id,code):
         cur.execute("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s AND u.role = 'teacher' AND uc.code = %s;",(tokenData.id,code,))
         class_out = cur.fetchone()
         return class_out

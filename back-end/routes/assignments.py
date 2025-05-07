@@ -43,7 +43,11 @@ def userInClass(id,code):
 
 def checkCode(code):
     cur.execute("SELECT * FROM class WHERE code = %s;",(str(code),))
-    if cur.fetchone():
+    try:
+        x = cur.fetchone()
+    except:
+        return False
+    if x:
         return True
     else:
         return False
