@@ -4,8 +4,8 @@ import psycopg2, os, time, random
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from .. import schemas, utils, oauth2
-
+from .. import schemas, oauth2
+from ..utils import sqlQuery
 load_dotenv()
 db_user = os.getenv("DB_User")
 db_pass = os.getenv("DB_User_PASS")
@@ -26,41 +26,22 @@ while True:
 router = APIRouter(prefix='/classes/assignments',tags=['Assignments'])
 
 def verifyTeacher(id):
-    cur.execute("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
-    relation = cur.fetchone()
-    if relation:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
+    if not x or x == None:
         return False
+    return True
 
 def userInClass(id,code):
-    cur.execute("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
-    relation = cur.fetchone()
-    if relation:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
+    if not x or x == None:
         return False
+    return True
 
 def checkCode(code):
-    cur.execute("SELECT * FROM class WHERE code = %s;",(str(code),))
-    try:
-        x = cur.fetchone()
-    except:
+    x = sqlQuery("SELECT * FROM class WHERE code = %s;",(str(code),))
+    if not x or x == None:
         return False
-    if x:
-        return True
-    else:
-        return False
-
-@router.get("/{code}", response_model=List[schemas.AssignmentOut])
-def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(code):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-    if not userInClass(tokenData.id,code):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    cur.execute("SELECT * FROM assignments WHERE code = %s;",(code,))
-    assignments = cur.fetchall()
-    return assignments
+    return True
 
 @router.post("/", response_model=schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_assignment(data:schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
@@ -76,6 +57,16 @@ def create_assignment(data:schemas.MakeAssignment,tokenData = Depends(oauth2.get
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
+
+@router.get("/{code}", response_model=List[schemas.AssignmentOut])
+def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    cur.execute("SELECT * FROM assignments WHERE code = %s;",(code,))
+    assignments = cur.fetchall()
+    return assignments
 
 @router.put("/", response_model=schemas.AssignmentOut)
 def update_assignment(data:schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):

@@ -5,7 +5,8 @@ import psycopg2, os, time, random
 from psycopg2 import Error
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from .. import schemas, utils, oauth2
+from .. import schemas, oauth2
+from ..utils import sqlQuery
 
 load_dotenv()
 db_user = os.getenv("DB_User")
@@ -27,57 +28,47 @@ while True:
 router = APIRouter(prefix='/classes',tags=['Classes'])
 
 def checkCode(code):
-    cur.execute("SELECT * FROM class WHERE code = %s;",(str(code),))
-    if cur.fetchone():
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM class WHERE code = %s;",(str(code),))
+    if not x or x == None:
         return False
+    return True
+    
 
 def checkEmail(email):
-    cur.execute("SELECT * FROM users WHERE email = %s;",(str(email),))
-    if cur.fetchone():
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
+    if not x or x == None:
         return False
+    return True
 
 def getUserId(email):
-    cur.execute("SELECT * FROM users WHERE email = %s;",(str(email),))
-    user = cur.fetchone()
+    user = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="not a valid email")
     return user['user_id'] # type: ignore
 
 def verifyTeacher(id):
-    cur.execute("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
-    relation = cur.fetchone()
-    if relation:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
+    if not x or x == None:
         return False
+    return True
 
 def verifyOwner(code,id):
-    cur.execute("SELECT * FROM class WHERE owner = %s AND code = %s;",(id,code,))
-    relation = cur.fetchone()
-    if relation:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM class WHERE owner = %s AND code = %s;",(id,code,))
+    if not x or x == None:
         return False
+    return True
 
 def checkIfInvitedT(code,id):
-    cur.execute("SELECT * FROM users WHERE %s = ANY(join_req) AND user_id = %s AND role = 'teacher';", (code,id,))
-    invite_status = cur.fetchone()
-    if invite_status:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM users WHERE %s = ANY(join_req) AND user_id = %s AND role = 'teacher';", (code,id,))
+    if not x or x == None:
         return False
+    return True
 
 def userInClass(id,code):
-    cur.execute("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
-    relation = cur.fetchone()
-    if relation:
-        return True
-    else:
+    x = sqlQuery("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
+    if not x or x == None:
         return False
+    return True
 
 @router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
@@ -177,7 +168,7 @@ def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current
 @router.get("/{code}")
 def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
-        raise 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This code doesnt exist")
     if userInClass(tokenData.id,code):
         cur.execute("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s AND u.role = 'teacher' AND uc.code = %s;",(tokenData.id,code,))
         class_out = cur.fetchone()

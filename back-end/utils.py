@@ -21,7 +21,7 @@ while True:
         print(f"Error connecting to DB: {e}")
         time.sleep(5)
 
-def sqlQuery(sql: str, type: str, params: tuple):
+def sqlQuery(sql: str, params: tuple, type: str = ''):
     cur.execute(sql,params)
     try:
         if type == "fa":
