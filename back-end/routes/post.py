@@ -24,5 +24,5 @@ while True:
         time.sleep(5)
 
 
-router = APIRouter(prefix="/messages",tags=['Messages'])
+router = APIRouter(prefix="/posts",tags=['Posts'])
 

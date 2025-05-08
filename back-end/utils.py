@@ -21,10 +21,10 @@ while True:
         print(f"Error connecting to DB: {e}")
         time.sleep(5)
 
-def sqlQuery(sql: str, params: tuple, type: str = ''):
+def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
     cur.execute(sql,params)
     try:
-        if type == "fa":
+        if fetchALL:
             out = cur.fetchall()
         else:
             out = cur.fetchone()
