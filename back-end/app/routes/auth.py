@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, status
-from .. import schemas, utils, oauth2
+from .. import utils, oauth2
+from ..schemas import auth_schemas
 from ..utils import sqlQuery
 
 router = APIRouter(tags=['Auth'])
 
 @router.post("/login")
-def login(user_cred: schemas.LoginInput):
+def login(user_cred: auth_schemas.LoginInput):
     hashed_pass = sqlQuery("SELECT * FROM users WHERE email = %s;",(user_cred.email,))
     if not hashed_pass:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")

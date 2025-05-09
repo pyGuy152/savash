@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
-from .. import schemas, utils, oauth2
+from .. import utils, oauth2
+from ..schemas import users_schemas
 from ..utils import sqlQuery
 
 router = APIRouter(prefix='/users',tags=['Users'])
@@ -12,8 +13,8 @@ def check_user(email: str):
     else:
         return True
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
-def make_user(user_cred: schemas.UserCreate):
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=users_schemas.UserOut)
+def make_user(user_cred: users_schemas.UserCreate):
     if check_user(user_cred.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email aldready taken")
     user_cred.password = utils.get_password_hash(user_cred.password)
@@ -22,7 +23,7 @@ def make_user(user_cred: schemas.UserCreate):
         new_user['join_req'] = [] # type: ignore
     return new_user
 
-@router.get('/', response_model=schemas.UserOut)
+@router.get('/', response_model=users_schemas.UserOut)
 def get_user(tokenData = Depends(oauth2.get_current_user)):
     user = sqlQuery("SELECT * FROM users WHERE user_id = %s;",(tokenData.id,))
     if not user:
@@ -31,8 +32,8 @@ def get_user(tokenData = Depends(oauth2.get_current_user)):
         user['join_req'] = []  # type: ignore
     return user
 
-@router.put('/', response_model=schemas.UserOut)
-def update_user(user_cred: schemas.UserCreate, tokenData = Depends(oauth2.get_current_user)):
+@router.put('/', response_model=users_schemas.UserOut)
+def update_user(user_cred: users_schemas.UserCreate, tokenData = Depends(oauth2.get_current_user)):
     if check_user(user_cred.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email aldready taken")
     user_cred.password = utils.get_password_hash(user_cred.password)

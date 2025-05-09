@@ -1,7 +1,8 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
 import random
-from .. import schemas, oauth2
+from .. import oauth2
+from ..schemas import classes_schemas
 from ..utils import sqlQuery
 
 
@@ -50,8 +51,8 @@ def userInClass(id,code):
         return False
     return True
 
-@router.post("/", response_model=schemas.ClassOut, status_code=status.HTTP_201_CREATED)
-def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
+@router.post("/", response_model=classes_schemas.ClassOut, status_code=status.HTTP_201_CREATED)
+def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     while checkCode(code):
         code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
@@ -62,13 +63,13 @@ def make_class(class_data: schemas.ClassMake, tokenData = Depends(oauth2.get_cur
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to create a class")
 
-@router.get("/", response_model=List[schemas.ClassOut])
+@router.get("/", response_model=List[classes_schemas.ClassOut])
 def get_class(tokenData = Depends(oauth2.get_current_user)):
     classes = sqlQuery("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s;",(tokenData.id,),fetchALL=True)
     return classes
 
 @router.post("/add")
-def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+def add_student_to_class(inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(inviteData.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
@@ -84,7 +85,7 @@ def add_student_to_class(inviteData:schemas.ClassUsers, tokenData = Depends(oaut
         HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='No invites sent')
 
 @router.post("/remove")
-def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+def remove_student_from_class(removeData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(removeData.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
@@ -98,8 +99,8 @@ def remove_student_from_class(removeData:schemas.ClassUsers, tokenData = Depends
     else:
         return {"message":"Removed from class"}
 
-@router.put('/',response_model=List[schemas.ClassOut])
-def update_class(data:schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
+@router.put('/',response_model=List[classes_schemas.ClassOut])
+def update_class(data:classes_schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
     if verifyOwner(data.code,tokenData.id):
         updated_class = sqlQuery("UPDATE class SET name = %s WHERE code = %s RETURNING *;",(data.name,data.code,))
         if not updated_class:
@@ -109,7 +110,7 @@ def update_class(data:schemas.UpdateClass,tokenData = Depends(oauth2.get_current
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to update this class")
 
 @router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
-def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
+def delete_class(data:classes_schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
     if verifyOwner(data.code,tokenData.id):
         deleted_class = sqlQuery("DELETE FROM class WHERE code = %s RETURNING *;",(data.code,))
         if not deleted_class:
@@ -118,7 +119,7 @@ def delete_class(data:schemas.DelClass,tokenData = Depends(oauth2.get_current_us
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to delete this class")
 
 @router.post('/join')
-def join_a_class(data: schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
+def join_a_class(data: classes_schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(data.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id) or checkIfInvitedT(data.code,tokenData.id):
