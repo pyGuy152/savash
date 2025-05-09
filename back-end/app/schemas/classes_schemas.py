@@ -7,6 +7,7 @@ class ClassMake(BaseModel):
     name: str
 
 class ClassOut(BaseModel):
+    code: int
     name: str
     created_at : datetime
 
