@@ -5,7 +5,7 @@ from ..utils import sqlQuery
 
 router = APIRouter(tags=['Auth'])
 
-@router.post("/login")
+@router.post("/login", response_model=auth_schemas.Token)
 def login(user_cred: auth_schemas.LoginInput):
     hashed_pass = sqlQuery("SELECT * FROM users WHERE email = %s;",(user_cred.email,))
     if not hashed_pass:

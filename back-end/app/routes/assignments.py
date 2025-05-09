@@ -4,7 +4,7 @@ from .. import oauth2
 from ..schemas import assignments_schemas
 from ..utils import sqlQuery
 
-router = APIRouter(prefix='/classes/assignments',tags=['Assignments'])
+router = APIRouter(prefix='/classes/{code}/assignments',tags=['Assignments'])
 
 def verifyTeacher(id):
     x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
@@ -24,7 +24,7 @@ def checkCode(code):
         return False
     return True
 
-@router.post("/{code}", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
@@ -37,7 +37,7 @@ def create_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
 
-@router.get("/{code}", response_model=List[assignments_schemas.AssignmentOut])
+@router.get("/", response_model=List[assignments_schemas.AssignmentOut])
 def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
@@ -46,7 +46,7 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
     assignments = sqlQuery("SELECT * FROM assignments WHERE code = %s;",(code,),fetchALL=True)
     return assignments
 
-@router.put("/{code}", response_model=assignments_schemas.AssignmentOut)
+@router.put("/", response_model=assignments_schemas.AssignmentOut)
 def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
@@ -59,7 +59,7 @@ def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenD
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
 
-@router.delete("/{code}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
