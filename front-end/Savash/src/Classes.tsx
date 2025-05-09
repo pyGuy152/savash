@@ -2,9 +2,7 @@ import "./Classes.css";
 
 import { useEffect, useState } from "react";
 
-const apiUrl = "https://api.codewasabi.xyz";
-
-import { Class, LOGOUT, getAllClasses, getToken } from "./types.ts";
+import { Class, getAllClasses } from "./types.ts";
 
 import ClassList from "./components/ClassList.tsx";
 //import { useNavigate } from "react-router-dom";
