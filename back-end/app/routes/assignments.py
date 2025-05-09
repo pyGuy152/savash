@@ -24,15 +24,15 @@ def checkCode(code):
         return False
     return True
 
-@router.post("/", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_assignment(data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(data.code):
+@router.post("/{code}", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
+def create_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
-    if not userInClass(tokenData.id,data.code):
+    if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery("INSERT INTO assignments (code, title, description, due_date) VALUES (%s,%s,%s,%s) RETURNING *;",(data.code,data.title,data.description,data.due_date,))
+    new_assignment = sqlQuery("INSERT INTO assignments (code, title, description, due_date) VALUES (%s,%s,%s,%s) RETURNING *;",(code,data.title,data.description,data.due_date,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
@@ -46,28 +46,28 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
     assignments = sqlQuery("SELECT * FROM assignments WHERE code = %s;",(code,),fetchALL=True)
     return assignments
 
-@router.put("/", response_model=assignments_schemas.AssignmentOut)
-def update_assignment(data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(data.code):
+@router.put("/{code}", response_model=assignments_schemas.AssignmentOut)
+def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
-    if not userInClass(tokenData.id,data.code):
+    if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s WHERE assignment_id = %s RETURNING *;",(data.code,data.title,data.description,data.due_date,data.assignment_id,))
+    new_assignment = sqlQuery("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s WHERE assignment_id = %s RETURNING *;",(code,data.title,data.description,data.due_date,data.assignment_id,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
-def delete_assignment(data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(data.code):
+@router.delete("/{code}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
-    if not userInClass(tokenData.id,data.code):
+    if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    del_assignment = sqlQuery("DELETE FROM assignments WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,data.code,))
+    del_assignment = sqlQuery("DELETE FROM assignments WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
     if not del_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No assignments were deleted")
 

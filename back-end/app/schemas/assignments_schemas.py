@@ -12,7 +12,6 @@ class AssignmentOut(BaseModel):
     created_at: datetime
 
 class MakeAssignment(BaseModel):
-    code: int
     title: str
     description: str
     due_date: datetime
@@ -21,5 +20,4 @@ class UpdateAssignment(MakeAssignment):
     assignment_id: int
 
 class DeleteAssignment(BaseModel):
-    code: int
     assignment_id: int
