@@ -139,7 +139,7 @@ def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You cannot access this info')
 
-@router.get("/{code}/people")
+@router.get("/{code}/people", response_model=List[classes_schemas.UsersInClass])
 def get_people_in_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This code doesnt exist")
@@ -148,3 +148,4 @@ def get_people_in_class(code: int, tokenData = Depends(oauth2.get_current_user))
         return class_out
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You cannot access this info')
+

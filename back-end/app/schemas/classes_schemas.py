@@ -16,3 +16,8 @@ class ClassUsers(BaseModel):
 
 class UpdateClass(BaseModel):
     name: str
+
+class UsersInClass(BaseModel):
+    name: str
+    username: str
+    email: EmailStr
