@@ -139,3 +139,4 @@ def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You cannot access this info')
 
+ 
