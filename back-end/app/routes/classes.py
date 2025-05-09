@@ -68,8 +68,8 @@ def get_all_classes(tokenData = Depends(oauth2.get_current_user)):
     classes = sqlQuery("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s;",(tokenData.id,),fetchALL=True)
     return classes
 
-@router.post("/{code}/add")
-def add_student_to_class(code:int,inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+@router.post("/{code}/invite")
+def invite_user_to_class(code:int,inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
@@ -85,7 +85,7 @@ def add_student_to_class(code:int,inviteData:classes_schemas.ClassUsers, tokenDa
         HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='No invites sent')
 
 @router.post("/{code}/remove")
-def remove_student_from_class(code:int,removeData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+def remove_user_from_class(code:int,removeData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
