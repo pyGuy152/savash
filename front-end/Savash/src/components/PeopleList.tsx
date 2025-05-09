@@ -4,7 +4,7 @@ interface PeopleListProp {
 }
 
 function PeopleList({classID}: PeopleListProp) {
-    return (<h1>WIP</h1>)
+    return (<h1>{classID}</h1>)
 }
 
 export default PeopleList;
