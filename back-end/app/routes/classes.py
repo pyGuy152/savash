@@ -64,67 +64,67 @@ def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to create a class")
 
 @router.get("/", response_model=List[classes_schemas.ClassOut])
-def get_class(tokenData = Depends(oauth2.get_current_user)):
+def get_all_classes(tokenData = Depends(oauth2.get_current_user)):
     classes = sqlQuery("SELECT c.code, c.name, c.created_at FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE u.user_id = %s;",(tokenData.id,),fetchALL=True)
     return classes
 
-@router.post("/add")
-def add_student_to_class(inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(inviteData.code):
+@router.post("/{code}/add")
+def add_student_to_class(code:int,inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwner(inviteData.code,tokenData.id):
+    if not verifyOwner(code,tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
     if int(getUserId(inviteData.email)) == int(tokenData.id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="User tried to add themself")
-    x = sqlQuery("UPDATE users SET join_req = array_append(join_req, %s) WHERE email = %s RETURNING *;",(inviteData.code,inviteData.email))
+    x = sqlQuery("UPDATE users SET join_req = array_append(join_req, %s) WHERE email = %s RETURNING *;",(code,inviteData.email))
     if x:
         return {'message':'invite sent!!!'}
     else:
         HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='No invites sent')
 
-@router.post("/remove")
-def remove_student_from_class(removeData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(removeData.code):
+@router.post("/{code}/remove")
+def remove_student_from_class(code:int,removeData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwner(removeData.code,tokenData.id):
+    if not verifyOwner(code,tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove users from this class")
-    removed = sqlQuery("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(removeData.code,getUserId(removeData.email),))
-    removed_1 = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE email = %s RETURNING *;",(removeData.code,removeData.email))
+    removed = sqlQuery("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(code,getUserId(removeData.email),))
+    removed_1 = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE email = %s RETURNING *;",(code,removeData.email))
     if not removed_1 and not removed:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Did not remove from class')
     else:
         return {"message":"Removed from class"}
 
-@router.put('/',response_model=List[classes_schemas.ClassOut])
-def update_class(data:classes_schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
-    if verifyOwner(data.code,tokenData.id):
-        updated_class = sqlQuery("UPDATE class SET name = %s WHERE code = %s RETURNING *;",(data.name,data.code,))
+@router.put('/{code}',response_model=List[classes_schemas.ClassOut])
+def update_class(code:int,data:classes_schemas.UpdateClass,tokenData = Depends(oauth2.get_current_user)):
+    if verifyOwner(code,tokenData.id):
+        updated_class = sqlQuery("UPDATE class SET name = %s WHERE code = %s RETURNING *;",(data.name,code,))
         if not updated_class:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Could not update class')
         return updated_class
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to update this class")
 
-@router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
-def delete_class(data:classes_schemas.DelClass,tokenData = Depends(oauth2.get_current_user)):
-    if verifyOwner(data.code,tokenData.id):
-        deleted_class = sqlQuery("DELETE FROM class WHERE code = %s RETURNING *;",(data.code,))
+@router.delete('/{code}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_class(code:int ,tokenData = Depends(oauth2.get_current_user)):
+    if verifyOwner(code,tokenData.id):
+        deleted_class = sqlQuery("DELETE FROM class WHERE code = %s RETURNING *;",(code,))
         if not deleted_class:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,detail='Could not delete class')
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to delete this class")
 
-@router.post('/join')
-def join_a_class(data: classes_schemas.JoinClass, tokenData = Depends(oauth2.get_current_user)):
-    if not checkCode(data.code):
+@router.post('/{code}/join')
+def join_a_class(code: int, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-    if not verifyTeacher(tokenData.id) or checkIfInvitedT(data.code,tokenData.id):
-        relation = sqlQuery("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,data.code,))
-        removed_invite = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE user_id = %s RETURNING *;",(data.code,tokenData.id))
+    if not verifyTeacher(tokenData.id) or checkIfInvitedT(code,tokenData.id):
+        relation = sqlQuery("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,code,))
+        removed_invite = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE user_id = %s RETURNING *;",(code,tokenData.id))
         return relation
     else:
         raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="nuh uh")

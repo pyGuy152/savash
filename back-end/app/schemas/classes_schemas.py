@@ -6,21 +6,12 @@ from datetime import datetime
 class ClassMake(BaseModel):
     name: str
 
-class ClassBase(BaseModel):
-    code: int
-
-class ClassOut(ClassBase):
+class ClassOut(BaseModel):
     name: str
     created_at : datetime
 
-class ClassUsers(ClassBase):
+class ClassUsers(BaseModel):
     email: EmailStr
 
-class DelClass(ClassBase):
-    pass
-
-class UpdateClass(ClassBase):
+class UpdateClass(BaseModel):
     name: str
-
-class JoinClass(ClassBase):
-    pass
