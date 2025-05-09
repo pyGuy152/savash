@@ -28,7 +28,8 @@ def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
             out = cur.fetchall()
         else:
             out = cur.fetchone()
-    except:
+    except Exception as e:
+        print(e)
         return 
     conn.commit()
     return out
