@@ -15,6 +15,7 @@ import "./Class.css"
 
 import AssignmentList from "./components/AssignmentList.tsx"
 import Tabs from "./components/Tabs.tsx";
+import PeopleList from "./components/PeopleList.tsx";
 
 function ClassComponent(){
     const navigate = useNavigate();
@@ -33,7 +34,8 @@ function ClassComponent(){
         if(!classID || classID < 0){
             alert("classID not valid: " + classID);
         }
-        fetch(apiUrl + "/classes", {
+        console.log(classID);
+        fetch(apiUrl + "/classes/" + classID + "/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -42,8 +44,7 @@ function ClassComponent(){
         })
           .then((res) => res.json())
           .then((data) => {
-            if (!data || data.length == 0) {
-              alert("You aren't in any classes");
+            if (!data) {
               if(localStorage.getItem("role") === "teacher"){
                 navigate("/classes");
               }
@@ -52,13 +53,8 @@ function ClassComponent(){
               }
               return;
             }
-            console.log(data);
-            let dateParsed = data.find((classItem: Class) => classItem.code === classID);
-            if(!dateParsed){
-                alert("You are not in this class");
-                navigate("/");
-                return;
-            }
+            console.log("classData: ", data);
+            let dateParsed = data;
             setClassData(dateParsed);
           })
           .catch((err) => {
@@ -70,23 +66,28 @@ function ClassComponent(){
       }
 
       function fetchAssignments() {
-        fetch(apiUrl + "/classes/assignments", {
+        fetch(apiUrl + "/classes/" + classID + "/assignments/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: "bearer " + getToken(document.cookie),
           },
-          body: JSON.stringify({
-            code: classID
-          }),
         })
           .then((res) => res.json())
           .then((data) => {
             if (!data || !Array.isArray(data)) {
               return;
             }
+            data.forEach(
+              (assigned) =>
+                {
+                  assigned.created_at = new Date(assigned.created_at); 
+                  assigned.due_date = new Date(assigned.due_date); 
+                }
+            );
+            let dataParsed = data;
             console.log(data);
-            setAssignments(data);
+            setAssignments(dataParsed);
           })
           .catch((err) => {
             alert(err);
@@ -117,7 +118,7 @@ function ClassComponent(){
     },
     {
       title: "People",
-      element: <h1>Many people</h1>
+      element: <PeopleList classID={classID}/>
     }
     ];
 
@@ -138,3 +139,6 @@ function ClassComponent(){
 }
 
 export default ClassComponent;
+
+
+  

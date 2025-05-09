@@ -4,11 +4,22 @@
 }
 
 .assignment-list .row{
-    border: 2px white solid;
+    border-bottom: 2px var(--navColor) solid;
     display: flex;
     flex: 1;
     justify-content: space-between;
     padding: 10px 20px;
+    align-items: center;
+}
+
+.assignment-list .left{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.assignment-list img{
+    height: 32px;
 }
 
 .noAssignments {

@@ -29,5 +29,9 @@
 .tab-content {
     background-color: var(--tabBackgroundColor);
     min-height: 500px;
-    border-radius: 15px;;
+    border-radius: 15px;
+}
+
+.tab-content .content.hidden {
+    display: none;
 }

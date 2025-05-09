@@ -1,11 +1,11 @@
 import ClassList from "./components/ClassList.tsx";
 import StudentNav from "./components/StudentNav";
 
-import { Class, getToken, LOGOUT } from "./types.ts";
+import { Class } from "./types.ts";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
-const apiUrl = "https://api.codewasabi.xyz";
+import { getAllClasses } from "./types.ts";
 
 import "./Dashboard.css";
 
@@ -15,40 +15,15 @@ function Dashboard() {
       code: 0,
       created_at: new Date()
     }]);
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
   
-    function fetchClasses() {
-      fetch(apiUrl + "/classes", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "bearer " + getToken(document.cookie),
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data || data.length == 0) {
-            setClasses([]);
-            return;
-          }
-          console.log(data);
-          let dateParsed = data.map((classItem: Class) => {
-            return {
-              ...classItem,
-              created_at: new Date(classItem.created_at),
-            };
-          });
-          setClasses(dateParsed);
-        })
-        .catch((err) => {
-          alert(err);
-          LOGOUT();
-          navigate("/");
-          console.error(err);
-        });
+    async function fetchClasses() {
+      setClasses(await getAllClasses());
     }
-    
-  useEffect(fetchClasses, []);
+
+    useEffect(() => {
+      fetchClasses();
+    }, []);
 
   return (
     <>

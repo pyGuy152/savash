@@ -17,11 +17,8 @@ function Join() {
       alert("Name must be at least 3 characters long.");
       return;
     }
-
-    const data = { code };
     console.log(apiUrl);
-    fetch(apiUrl + "/classes/join", {
-      body: JSON.stringify(data),
+    fetch(apiUrl + "/classes/" + code + "/join/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

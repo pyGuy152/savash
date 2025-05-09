@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import TeacherNav from "./components/TeacherNav";
-import { getToken } from "./types";
+import { getToken } from "./types.ts";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
@@ -42,14 +42,14 @@ function AddAssignment() {
         description = "There is no information about this assignment.";
       }
       
-      const data = { code, title: name, due_date, description };
+      const data = { title: name, due_date, description };
       console.log(data);
-      fetch(apiUrl + "/classes/assignments/", {
+      fetch(apiUrl + "/classes/" + code + "/assignments/", {
         body: JSON.stringify(data),
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: getToken(document.cookie)
+          Authorization: "bearer " + getToken(document.cookie)
         },
       }).then(() => {
         navigate("/class/"+code);

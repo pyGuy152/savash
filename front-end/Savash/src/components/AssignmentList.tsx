@@ -1,7 +1,7 @@
 
 import "./AssignmentList.css"
 
-import { Assignment } from "../types"
+import { Assignment } from "../types.ts"
 
 interface AssignmentListProps {
     list : Assignment[]
@@ -13,18 +13,18 @@ function AssignmentList({ list }:AssignmentListProps) {
         return <h2 className="noAssignments">No assignments yet.</h2>;
     }
     return (
-        <ul className="assignment-list">
-            {
-                list.map(row => (
-                    <li className="row">
-                        <img src="/icons/paperclip.png"></img>
-                        <p>{row.title}</p>
-                        <p>{row.due_date.toLocaleDateString()}</p>
-                    </li>
-                ))
-            }
-        </ul>
-    )
+      <ul className="assignment-list">
+        {list.map((row, i) => (
+          <li key={i} className="row">
+            <div className="left">
+              <img src="/icons/paperclip.png"></img>
+              <p>{row.title}</p>
+            </div>
+            <p>{row.due_date.toLocaleDateString()}</p>
+          </li>
+        ))}
+      </ul>
+    );
 }
 
 export default AssignmentList;

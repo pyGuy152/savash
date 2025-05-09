@@ -18,7 +18,9 @@ function Tabs({ options } : TabsProps) {
             <li key={i} onClick={() => setSelected(i)} className={i===selected ? "tab selected" : "tab"}>{option.title}</li>
           ))}
         </ul>
-        <div className="tab-content">{options[selected].element}</div>
+        <div className="tab-content">{
+          options.map((e, i) => (<div key={i} className={i === selected ? "content" : "content hidden"}>{e.element}</div>))
+        }</div>
       </div>
     );
 }

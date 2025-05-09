@@ -8,6 +8,7 @@ function App() {
     <>
       <HomeNav />
       <h1 className="welcome">Welcome to Savash.ai</h1>
+      <h2 className="welcome">The note taking and assignment submission app</h2>
     </>
   );
 }

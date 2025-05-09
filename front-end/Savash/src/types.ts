@@ -1,5 +1,7 @@
 import { ReactElement } from "react";
 
+export const apiUrl = "https://api.codewasabi.xyz";
+
 
 export interface Class {
     code: number;
@@ -37,4 +39,35 @@ export interface Assignment {
 export interface Tab {
   title : string,
   element : ReactElement
+}
+
+export async function getAllClasses(){
+  let ans: Class[] = [];
+  await fetch(apiUrl + "/classes", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "bearer " + getToken(document.cookie),
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data || data.length == 0) {
+        return;
+      }
+      console.log(data);
+      let dateParsed = data.map((classItem: Class) => {
+        return {
+          ...classItem,
+          created_at: new Date(classItem.created_at),
+        };
+      });
+      ans = dateParsed;
+    })
+    .catch((err) => {
+      alert(err);
+      LOGOUT();
+      console.error(err);
+    });
+  return ans;
 }
