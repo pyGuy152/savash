@@ -30,7 +30,7 @@ def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
             out = cur.fetchone()
     except Exception as e:
         print(e)
-        return 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='SQL query problem')
     conn.commit()
     return out
 
