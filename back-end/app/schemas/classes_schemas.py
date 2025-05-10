@@ -21,3 +21,4 @@ class UsersInClass(BaseModel):
     name: str
     username: str
     email: EmailStr
+    role: str

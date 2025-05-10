@@ -13,7 +13,6 @@ def checkCode(code):
     if not x or x == None:
         return False
     return True
-    
 
 def checkEmail(email):
     x = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
