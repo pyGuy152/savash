@@ -25,7 +25,7 @@ def checkCode(code):
     return True
 
 @router.post("/written", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_written_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+def create_written_assignment(code:int,data:assignments_schemas.WrittenAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -38,7 +38,7 @@ def create_written_assignment(code:int,data:assignments_schemas.MakeAssignment,t
     return new_assignment
 
 @router.post("/mcq", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_mcq_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+def create_mcq_assignment(code:int,data:assignments_schemas.MCQAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -51,7 +51,7 @@ def create_mcq_assignment(code:int,data:assignments_schemas.MakeAssignment,token
     return new_assignment
 
 @router.post("/frq", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_frq_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+def create_frq_assignment(code:int,data:assignments_schemas.FRQAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -64,7 +64,7 @@ def create_frq_assignment(code:int,data:assignments_schemas.MakeAssignment,token
     return new_assignment
 
 @router.post("/tfq", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_tfq_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+def create_tfq_assignment(code:int,data:assignments_schemas.TFQAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -77,7 +77,7 @@ def create_tfq_assignment(code:int,data:assignments_schemas.MakeAssignment,token
     return new_assignment
 
 @router.post("/coding", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_coding_assignment(code:int,data:assignments_schemas.MakeAssignment,tokenData = Depends(oauth2.get_current_user)):
+def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -106,7 +106,7 @@ def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenD
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s, type = %s WHERE assignment_id = %s RETURNING *;",(code,data.title,data.description,data.due_date,data.type,data.assignment_id,))
+    new_assignment = sqlQuery("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s, type = %s WHERE assignment_id = %s RETURNING *;",(code,data.title,data.description,data.due_date,data.assignment_id,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment

@@ -3,27 +3,39 @@ from pydantic import BaseModel, EmailStr
 from enum import Enum
 from datetime import datetime
 
-class AssignmentTypes(str, Enum):
-    WRITTEN = 'Written'
-    MCQ = 'MCQ'
-    FRQ = 'FRQ'
-    TFQ = 'TFQ'
-    CODING = 'Coding'
-
-class AssignmentOut(BaseModel):
-    assignment_id: int
+class AssignmentBase(BaseModel):
     title: str
     description: str
     due_date: datetime
     created_at: datetime
 
-class MakeAssignment(BaseModel):
+class AssignmentOut(BaseModel):
+    assignment_id: int
     title: str
-    description: str
+    directions: str
     due_date: datetime
-    type: AssignmentTypes
+    created_at: datetime
 
-class UpdateAssignment(MakeAssignment):
+class WrittenAssignment(AssignmentBase):
+    pass
+
+class MCQAssignment(AssignmentBase):
+    questions: list
+    choices: list
+    correct_answer: list
+
+class FRQAssignment(AssignmentBase):
+    questions: list
+
+class TFQAssignment(AssignmentBase):
+    questions: list
+    correct_answer: list
+
+class CodingAssignment(AssignmentBase):
+    test_case_input : list
+    test_case_output : list
+
+class UpdateAssignment(AssignmentBase):
     assignment_id: int
 
 class DeleteAssignment(BaseModel):
