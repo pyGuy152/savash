@@ -3,9 +3,11 @@ anyio==4.9.0
 bcrypt==4.3.0
 certifi==2025.4.26
 cffi==1.17.1
+charset-normalizer==3.4.2
 click==8.1.8
 cryptography==44.0.3
 dnspython==2.7.0
+docker==7.1.0
 ecdsa==0.19.1
 email_validator==2.2.0
 fastapi==0.115.12
@@ -35,6 +37,7 @@ python-dotenv==1.1.0
 python-jose==3.4.0
 python-multipart==0.0.20
 PyYAML==6.0.2
+requests==2.32.3
 rich==14.0.0
 rich-toolkit==0.14.3
 rsa==4.9.1
@@ -46,6 +49,7 @@ typer==0.15.3
 typing-inspection==0.4.0
 typing_extensions==4.13.2
 ujson==5.10.0
+urllib3==2.4.0
 uvicorn==0.34.2
 uvloop==0.21.0
 watchfiles==1.0.5
