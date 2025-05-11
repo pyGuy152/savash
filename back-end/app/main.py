@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from .routes import auth, users, classes, assignments, posts, games
 from fastapi.middleware.cors import CORSMiddleware
-from . import runcode
 app = FastAPI()
 
 origins = [
@@ -24,7 +23,6 @@ app.include_router(classes.router)
 app.include_router(assignments.router)
 app.include_router(posts.router)
 app.include_router(games.router)
-app.include_router(runcode.router)
 
 @app.get("/")
 def root():
