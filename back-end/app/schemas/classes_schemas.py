@@ -2,6 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 from datetime import datetime
+from .users_schemas import UserRole
 
 class ClassMake(BaseModel):
     name: str
@@ -21,4 +22,4 @@ class UsersInClass(BaseModel):
     name: str
     username: str
     email: EmailStr
-    role: str
+    role: UserRole

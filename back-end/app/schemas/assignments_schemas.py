@@ -1,12 +1,14 @@
 from typing import Optional
+from itsdangerous import NoneAlgorithm
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 from datetime import datetime
 
 class AssignmentBase(BaseModel):
     title: str
-    description: str
-    due_date: datetime
+    description: Optional[str] = None
+    points: Optional[int] = None
+    due_date: Optional[datetime] = None
     created_at: datetime
 
 class AssignmentOut(BaseModel):
@@ -30,10 +32,6 @@ class FRQAssignment(AssignmentBase):
 class TFQAssignment(AssignmentBase):
     questions: list
     correct_answer: list
-
-class CodingAssignment(AssignmentBase):
-    test_case_input : list
-    test_case_output : list
 
 class UpdateAssignment(AssignmentBase):
     assignment_id: int

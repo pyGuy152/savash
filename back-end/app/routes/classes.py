@@ -21,7 +21,7 @@ def checkEmail(email):
     return True
 
 def getUserId(email):
-    user = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
+    user = sqlQuery("SELECT user_id FROM users WHERE email = %s;",(str(email),))
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="not a valid email")
     return user['user_id'] # type: ignore

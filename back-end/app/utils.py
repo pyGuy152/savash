@@ -9,19 +9,18 @@ load_dotenv()
 db_user = os.getenv("DB_User")
 db_pass = os.getenv("DB_User_PASS")
 
-# connect and create a cursor for the db
-while True:
-    try:
-        conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
-        cur = conn.cursor()
-        break
-    except Error as e:
-        if conn:
-            conn.close()
-        print(f"Error connecting to DB: {e}")
-        time.sleep(5)
 
 def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
+    while True:
+        try:
+            conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
+            cur = conn.cursor()
+            break
+        except Error as e:
+            if conn:
+                conn.close()
+            print(f"Error connecting to DB: {e}")
+            time.sleep(5)
     cur.execute(sql,params)
     try:
         if fetchALL:
@@ -32,6 +31,7 @@ def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
         print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='SQL query problem')
     conn.commit()
+    conn.close()
     return out
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
