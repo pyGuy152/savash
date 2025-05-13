@@ -9,3 +9,31 @@
     background-color: black;
     opacity: 0.3;
 }
+
+.people-list{
+    color: var(--textColor)
+}
+
+.person-row{
+    border-bottom: var(--navColor) 2px solid;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.person-row div {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.person-row .username{
+    color: rgb(124, 124, 124);
+    margin-left: 10px;
+}
+
+.person-row .kick {
+    background-color: var(--warningColor);
+    color: var(--navColor);
+    height: 45px;
+}

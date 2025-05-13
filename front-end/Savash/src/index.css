@@ -25,6 +25,7 @@
   --tint: #dfdfa2;
   --tabBackgroundColor: rgb(204, 204, 181);
   --midColor: rgb(185, 185, 185);
+  --warningColor: rgb(199, 10, 10);
 }
 
 body {

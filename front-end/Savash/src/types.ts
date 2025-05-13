@@ -71,3 +71,23 @@ export async function getAllClasses(){
     });
   return ans;
 }
+
+export interface Person {
+  name: String;
+  username: string;
+  email: string;
+}
+
+export async function getPeopleFromClass(classID: Number){
+  let data = await fetch(apiUrl + "/classes/" + classID + "/people/", {
+    method: "GET",
+    headers: {
+      Authorization: "bearer " + getToken(document.cookie)
+    }
+  });
+  
+
+  let dataParsed = data.json();
+
+  return dataParsed;
+}
