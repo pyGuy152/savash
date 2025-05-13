@@ -91,3 +91,8 @@ export async function getPeopleFromClass(classID: Number){
 
   return dataParsed;
 }
+
+export async function getAssignment(classID: Number){
+  //let data = await fetch(apiUrl + "/cla")
+  return 13;
+}
