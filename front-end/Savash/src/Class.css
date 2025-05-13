@@ -44,10 +44,30 @@
 
 .row .yes {
     background-color: var(--warningColor);
-    padding: 10px 20px;
+    
 }
 
 .row {
     display: flex;
     gap: 10px;
+    font-size: 1.5em;
+    padding: 10px 20px;
+    justify-content: space-between;
+}
+
+.kick {
+    max-width: 700px;
+    border: none;
+    border-radius: 20px;
+}
+
+.kick h1{
+    line-height: 1.5em;
+}
+
+.teacher {
+    color: var(--submitColor);
+    margin-right: 10px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }

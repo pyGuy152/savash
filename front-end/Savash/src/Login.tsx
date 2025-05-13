@@ -14,7 +14,7 @@ function Login() {
     useEffect(() => {
         
         if (getToken(document.cookie)) {
-          fetch(apiUrl + "/users", {
+          fetch(apiUrl + "/users/", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -39,7 +39,7 @@ function Login() {
 
     function fetchUserData(token: string) {
         console.log(token);
-        fetch(apiUrl + "/users", {
+        fetch(apiUrl + "/users/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

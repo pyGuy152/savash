@@ -35,7 +35,8 @@ function PeopleList({classID}: PeopleListProp) {
     }
 
     async function kickPerson(){
-      fetch(apiUrl + "/classes/" + classID + "/remove/", {
+      console.log(victim);
+      await fetch(apiUrl + "/classes/" + classID + "/remove/", {
         method: "POST",
         body: JSON.stringify({
           email: victim,
@@ -44,6 +45,8 @@ function PeopleList({classID}: PeopleListProp) {
           Authorization: "bearer " + getToken(document.cookie)
         }
       });
+      updatePeople();
+      closeDialog();
     }
 
     if(people.length === 0 || !Array.isArray(people)){
@@ -53,22 +56,35 @@ function PeopleList({classID}: PeopleListProp) {
         return (
           <>
             <dialog ref={confirmDialog} className="kick">
-              <h1>Are you sure you wanna kick <span className="victim">{victim}</span>?</h1>
+              <h1>
+                Are you sure you wanna kick{" "}
+                <span className="victim">{victim}</span>?
+              </h1>
               <div className="row">
-                <button onClick={closeDialog} className="no">No</button>
-                <button onClick={kickPerson} className="yes">Yes</button>
+                <button onClick={closeDialog} className="no">
+                  No
+                </button>
+                <button onClick={kickPerson} className="yes">
+                  Yes
+                </button>
               </div>
             </dialog>
             <ul className="people-list">
               {people.map((e, i) => (
                 <li key={i} className="person-row">
                   <p className="left">
+                    {e.role === "teacher" ? <span className="teacher">Teacher</span> : ""}
                     {e.name}
                     <span className="username">({e.username})</span>
                   </p>
                   <div className="middle">
                     <p>{e.email}</p>
-                    <button onClick={() => openDialog(e.email)} className="kick">Kick</button>
+                    <button
+                      onClick={() => openDialog(e.email)}
+                      className="kick"
+                    >
+                      Kick
+                    </button>
                   </div>
                 </li>
               ))}

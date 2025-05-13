@@ -76,6 +76,7 @@ export interface Person {
   name: String;
   username: string;
   email: string;
+  role: string;
 }
 
 export async function getPeopleFromClass(classID: Number){

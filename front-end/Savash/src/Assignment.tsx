@@ -8,7 +8,7 @@ function Assignment() {
 
     async function updateAssignmentData(){
         let data = await getAssignment(0);
-        setAssignmentData(data);
+        setAssignmentData(Number(data));
     }
 
     useEffect(() => {

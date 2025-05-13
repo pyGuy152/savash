@@ -20,7 +20,6 @@
     background-color: var(--backgroundColor);
     border-radius: 15px 15px 0 0;
     cursor: pointer;
-    box-shadow: inset 0px -10px 20px 10px rgba(0, 0, 0, 0.219);
 }
 
 .tab.selected {
