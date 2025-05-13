@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from .routes import auth, users, classes, assignments, posts, games
 from fastapi.middleware.cors import CORSMiddleware
-
 app = FastAPI()
 
 origins = [
@@ -27,5 +27,8 @@ app.include_router(games.router)
 
 @app.get("/")
 def root():
-    return {'message':'hello people of the world'}
+    return RedirectResponse("/docs", status_code=301)
 
+@app.get("/{x}")
+def not_found():
+    return RedirectResponse("/docs", status_code=301)

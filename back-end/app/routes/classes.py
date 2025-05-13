@@ -13,7 +13,6 @@ def checkCode(code):
     if not x or x == None:
         return False
     return True
-    
 
 def checkEmail(email):
     x = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
@@ -143,8 +142,8 @@ def get_one_class(code: int, tokenData = Depends(oauth2.get_current_user)):
 def get_people_in_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This code doesnt exist")
-    if userInClass(tokenData.id,code) and verifyTeacher(tokenData.id):
-        class_out = sqlQuery("SELECT u.name, u.username, u.email FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE c.code = 1196702 AND NOT u.user_id = 17;",(tokenData.id,code,), fetchALL=True)
+    if userInClass(tokenData.id,code):
+        class_out = sqlQuery("SELECT u.name, u.username, u.email, u.role FROM class c JOIN user_class uc ON c.code = uc.code JOIN users u ON uc.user_id = u.user_id WHERE c.code = %s;",(code,), fetchALL=True)
         return class_out
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You cannot access this info')

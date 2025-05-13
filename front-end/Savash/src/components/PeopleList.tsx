@@ -46,3 +46,4 @@ function PeopleList({classID}: PeopleListProp) {
     }
 }
 export default PeopleList;
+
