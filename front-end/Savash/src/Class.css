@@ -37,3 +37,17 @@
     color: var(--navColor);
     height: 45px;
 }
+
+.victim {
+    color: var(--warningColor)
+}
+
+.row .yes {
+    background-color: var(--warningColor);
+    padding: 10px 20px;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}

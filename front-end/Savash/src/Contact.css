@@ -1,10 +1,6 @@
 
-main > *{
+main.contact > *{
     text-indent: 2rem;
     margin-left: 0;
     padding: 0;
-}
-
-main ul{
-    list-style-type: circle;
 }
