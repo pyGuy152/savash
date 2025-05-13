@@ -11,9 +11,6 @@ function HomeNav() {
             <img src="logo-medium.png" alt="Savash Logo" className="logo" />
           </Link>
           <li>
-            <Link to="/pricing">Pricing</Link>
-          </li>
-          <li>
             <Link to="/contact">Contact</Link>
           </li>
         </ul>

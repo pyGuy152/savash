@@ -13,6 +13,7 @@ import Classes from './Classes.tsx'
 import Inbox from './Inbox.tsx'
 import Class from './Class.tsx'
 import AddAssignment from './AddAssignment.tsx'
+import Contact from './Contact.tsx'
 
 //https://www.youtube.com/watch?v=oTIJunBa6MA&ab_channel=CosdenSolutions
 
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
   {
     path: "/class/:id/add",
     element: <AddAssignment />
+  },
+  {
+    path: "/contact",
+    element: <Contact />
   }
 ]);
 
