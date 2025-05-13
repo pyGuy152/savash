@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from .routes import auth, users, classes, assignments, posts, games
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,10 +25,6 @@ app.include_router(assignments.router)
 app.include_router(posts.router)
 app.include_router(games.router)
 
-@app.get("/")
+@app.get('/')
 def root():
-    return RedirectResponse("/docs", status_code=301)
-
-@app.get("/{x}")
-def not_found():
-    return RedirectResponse("/docs", status_code=301)
+    return RedirectResponse('https://savash.rohanjain.xyz')
