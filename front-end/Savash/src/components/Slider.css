@@ -1,0 +1,34 @@
+
+.slider {
+    background-color: var(--midColor);
+    position: relative;
+    padding: 4px;
+    margin: 15px 0px;
+    border-radius: 10px;
+}
+
+.slider ul{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.slider ul li{
+    z-index: 21;
+    width: 60px;
+}
+
+.slider .selected{
+    position: absolute;
+    height: calc(100% - 5px);
+    width: 80px;
+    top: 2px;
+    background-color: var(--navColor);
+    z-index: 20;
+    transition: left 0.3s ease-in-out;
+    border-radius: 10px;
+}
+
+.slider .option {
+    cursor: pointer;
+    text-align: center;
+}

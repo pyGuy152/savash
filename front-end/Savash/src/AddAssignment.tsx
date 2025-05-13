@@ -1,11 +1,16 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import TeacherNav from "./components/TeacherNav";
 import { getToken } from "./types.ts";
+import Slider from "./components/Slider.tsx";
+import { useState } from "react";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
 function AddAssignment() {
     let code = Number(useParams().id);
+
+    const [selectedType, setSelectedType] = useState(0);
+
     if (!code || code < 0) {
       return (
         <>
@@ -56,6 +61,8 @@ function AddAssignment() {
       });
     }
 
+    const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"]
+
     return (
       <div>
         <TeacherNav />
@@ -67,6 +74,7 @@ function AddAssignment() {
           <input type="text" name="desc" id="desc" />
           <label htmlFor="due"></label>
           <input type="date" id="due" required />
+          <Slider options={sliderOptions} setSelectedType={setSelectedType} />
           <button type="submit" className="submit">
             Register
           </button>

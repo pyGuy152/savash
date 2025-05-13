@@ -35,7 +35,11 @@ function PeopleList({classID}: PeopleListProp) {
     }
 
     async function kickPerson(){
-      console.log(victim);
+      console.log(
+        JSON.stringify({
+          email: victim,
+        })
+      );
       await fetch(apiUrl + "/classes/" + classID + "/remove/", {
         method: "POST",
         body: JSON.stringify({
