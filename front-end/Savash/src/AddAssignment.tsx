@@ -1,8 +1,12 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import TeacherNav from "./components/TeacherNav";
-import { getToken } from "./types.ts";
+import { Assignment, getToken } from "./types.ts";
 import Slider from "./components/Slider.tsx";
-import { useState } from "react";
+import {  useState } from "react";
+import ConstructWritten from "./components/AssignmentContructing/ConstructWritten.tsx";
+
+import "./AddAssignment.css"
+import ConstructMCQ from "./components/AssignmentContructing/ConstructMCQ.tsx";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
@@ -61,7 +65,19 @@ function AddAssignment() {
       });
     }
 
-    const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"]
+    const [assignmentData, setAssignmentData] = useState<Assignment>();
+
+    const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"];
+    const sliderElems = [
+      <ConstructWritten
+        setAssignmentData={setAssignmentData}
+        assignmentData={assignmentData}
+      />,
+      <ConstructMCQ
+        setAssignmentData={setAssignmentData}
+        assignmentData={assignmentData}
+      />,
+    ];
 
     return (
       <div>
@@ -74,7 +90,11 @@ function AddAssignment() {
           <input type="text" name="desc" id="desc" />
           <label htmlFor="due"></label>
           <input type="date" id="due" required />
+          <hr />
           <Slider options={sliderOptions} setSelectedType={setSelectedType} />
+          {
+            sliderElems[selectedType]
+          }
           <button type="submit" className="submit">
             Register
           </button>

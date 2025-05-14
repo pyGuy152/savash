@@ -1,6 +1,6 @@
 
 import "./Slider.css"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SliderProps {
     options : string[];
@@ -16,6 +16,8 @@ function Slider({ options, setSelectedType }: SliderProps) {
     setSelectedType(i);
     setLeft((options[i] as HTMLElement).offsetLeft-10);
   }
+
+  useEffect(() => selectOption(0), []);
 
   return (
     <div className="slider">

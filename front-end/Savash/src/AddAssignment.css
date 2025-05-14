@@ -1,0 +1,29 @@
+
+.assignment-specific {
+    display: flex;
+    flex-direction: column;
+}
+
+hr{
+    border: dashed 2px var(--midColor);
+    width: 100%;
+}
+
+.assignment-specific .questions .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: var(--backgroundColor);
+}
+
+.assignment-specific .questions h2{
+    font-size: 2rem;
+    margin: 0;
+}
+
+.assignment-specific .questions .row .add {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    background-color: var(--submitColor);
+}

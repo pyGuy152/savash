@@ -28,14 +28,6 @@ export function getToken(cookie : string) {
     }
 }
 
-export interface Assignment {
-  assignment_id : Number;
-  title : string,
-  description : string,
-  due_date : Date,
-  created_at : Date
-}
-
 export interface Tab {
   title : string,
   element : ReactElement
@@ -96,4 +88,16 @@ export async function getPeopleFromClass(classID: Number){
 export async function getAssignment(classID: Number){
   //let data = await fetch(apiUrl + "/cla")
   return classID;
+}
+
+export interface Assignment{
+  assignment_id? : Number;
+  title? : string;
+  description? : string;
+  questions? : string[];
+  choices? : string[][];
+  correct_answer? : string[];
+  points : Number;
+  due_date? : Date;
+  created_at? : Date;
 }
