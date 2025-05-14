@@ -7,6 +7,17 @@ import random
 
 router = APIRouter(prefix='/classes/{code}/assignments',tags=['Assignments'])
 
+def validateMcq(data):
+    if not(len(data.questions) == len(data.choices) and len(data.questions) == len(data.correct_answer)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Make sure questions, correct_answer, and choices are all the same length')
+    for i in data.choices:
+        if not (len(i) >= 2 and len(i) <= 4 and isinstance(i, list)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure choices is a 2d array with the length of choices ranging from 2 to 4')
+
+def validateTfq(data):
+    if not(len(data.questions) == len(data.correct_answer)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure questions and correct_answer are the same length')
+
 def verifyTeacher(id):
     x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
     if not x or x == None:
@@ -47,20 +58,21 @@ def create_written_assignment(code:int,data:assignments_schemas.WrittenAssignmen
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery('INSERT INTO written (assignment_id, title, description, due_date, points) VALUES (%s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,))
+    new_assignment = sqlQuery('INSERT INTO written (assignment_id, title, description, due_date, points, code) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,code,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
 
 @router.post("/mcq", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_mcq_assignment(code:int,data:assignments_schemas.MCQAssignment,tokenData = Depends(oauth2.get_current_user)):
+    validateMcq(data)
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery('INSERT INTO mcq (assignment_id, title, description, due_date, points, questions, choices, correct_answer) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions,data.choices,data.correct_answer,))
+    new_assignment = sqlQuery('INSERT INTO mcq (assignment_id, title, description, due_date, points, questions, choices, correct_answer, code) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions,data.choices,data.correct_answer,code,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
@@ -73,20 +85,21 @@ def create_frq_assignment(code:int,data:assignments_schemas.FRQAssignment,tokenD
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery('INSERT INTO frq (assignment_id, title, description, due_date, points, questions) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions,))
+    new_assignment = sqlQuery('INSERT INTO frq (assignment_id, title, description, due_date, points, questions, code) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions,code,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
 
 @router.post("/tfq", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_tfq_assignment(code:int,data:assignments_schemas.TFQAssignment,tokenData = Depends(oauth2.get_current_user)):
+    validateTfq(data)
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = sqlQuery('INSERT INTO tfq (assignment_id, title, description, due_date, points, questions, correct_answer) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions, data.correct_answer, ))
+    new_assignment = sqlQuery('INSERT INTO tfq (assignment_id, title, description, due_date, points, questions, correct_answer, code) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.questions, data.correct_answer,code,))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
