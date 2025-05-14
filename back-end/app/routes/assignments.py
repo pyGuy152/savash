@@ -1,4 +1,5 @@
 from typing import List
+from xmlrpc.client import boolean
 from fastapi import APIRouter, status, HTTPException, Depends
 from .. import oauth2
 from ..schemas import assignments_schemas
@@ -8,15 +9,24 @@ import random
 router = APIRouter(prefix='/classes/{code}/assignments',tags=['Assignments'])
 
 def validateMcq(data):
-    if not(len(data.questions) == len(data.choices) and len(data.questions) == len(data.correct_answer)):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Make sure questions, correct_answer, and choices are all the same length')
-    for i in data.choices:
-        if not (len(i) >= 2 and len(i) <= 4 and isinstance(i, list)):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure choices is a 2d array with the length of choices ranging from 2 to 4')
+    try:
+        if not(len(data.questions) == len(data.choices) and len(data.questions) == len(data.correct_answer)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Make sure questions, correct_answer, and choices are all the same length')
+        for i in data.choices:
+            if not (len(i) >= 2 and len(i) <= 4 and isinstance(i, list)):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure choices is a 2d array with the length of choices ranging from 2 to 4')
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 def validateTfq(data):
-    if not(len(data.questions) == len(data.correct_answer)):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure questions and correct_answer are the same length')
+    try:
+        if not(len(data.questions) == len(data.correct_answer)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure questions and correct_answer are the same length')
+        for i in data.correct_answer:
+            if not(isinstance(i, boolean)):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure the choices are booleans')
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 def verifyTeacher(id):
     x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
@@ -133,18 +143,35 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
 
     return written + mcq + frq + tfq
 
-# @router.put("/", response_model=assignments_schemas.AssignmentOut)
-# def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
-#     if not checkCode(code):
-#         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-#     if not verifyTeacher(tokenData.id):
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
-#     if not userInClass(tokenData.id,code):
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-#     new_assignment = sqlQuery("UPDATE assignments SET code = %s, title = %s, description = %s, due_date = %s, type = %s WHERE assignment_id = %s RETURNING *;",(code,data.title,data.description,data.due_date,data.assignment_id,))
-#     if not new_assignment:
-#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
-#     return new_assignment
+@router.put("/", response_model=assignments_schemas.AssignmentOut)
+def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    if data.questions and data.choices and data.correct_answer:
+        validateMcq(data)
+        try_update_mcq_assignment = sqlQuery("UPDATE mcq SET title = %s, description = %s, questions = %s , choices = %s , correct_answer = %s ,due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.questions,data.choices,data.correct_answer,data.due_date,data.points,data.assignment_id,))
+    elif data.questions and data.correct_answer:
+        validateTfq(data)
+        try_update_tfq_assignment = sqlQuery("UPDATE tfq SET title = %s, description = %s, questions = %s ,correct_answer = %s ,due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.questions,data.correct_answer,data.due_date,data.points,data.assignment_id,))
+    elif data.questions:
+        try_update_frq_assignment = sqlQuery("UPDATE frq SET title = %s, description = %s, questions = %s ,due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.questions,data.due_date,data.points,data.assignment_id,))
+    else:
+        try_update_written_assignment = sqlQuery("UPDATE written SET title = %s, description = %s, due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.due_date,data.points,data.assignment_id,))
+
+    if try_update_mcq_assignment:
+        return try_update_mcq_assignment
+    elif try_update_tfq_assignment:
+        return try_update_tfq_assignment
+    elif try_update_frq_assignment:
+        return try_update_frq_assignment
+    elif try_update_written_assignment:
+        return try_update_written_assignment
+    else:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='No assignments were updated')
 
 @router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
