@@ -28,6 +28,13 @@ def validateTfq(data):
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
+def validateCodeing(data):
+    try:
+        if not(len(data.input) == len(data.output)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure input and output are the same length')
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
 def verifyTeacher(id):
     x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
     if not x or x == None:
@@ -113,6 +120,21 @@ def create_tfq_assignment(code:int,data:assignments_schemas.TFQAssignment,tokenD
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
+
+@router.post("/coding", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
+def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,tokenData = Depends(oauth2.get_current_user)):
+    validateCodeing(data)
+    if not checkCode(code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    new_assignment = None
+    if not new_assignment:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
+    return new_assignment
+
 
 @router.get("/", response_model=List[assignments_schemas.AssignmentOut])
 def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):

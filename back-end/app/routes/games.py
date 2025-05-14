@@ -60,5 +60,6 @@ async def websocket(code:int ,websocket: WebSocket):
             else:
                 await websocket.send_text("Incorrect")
         await websocket.close()
+        del game[code]
     except WebSocketDisconnect:
         print("Client disconnected")

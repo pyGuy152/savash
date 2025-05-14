@@ -37,6 +37,11 @@ class TFQAssignment(AssignmentBase):
     questions: list
     correct_answer: list
 
+class CodingAssignment(AssignmentBase):
+    input: list
+    output: list
+
+
 class UpdateAssignment(BaseModel):
     assignment_id: int
     title: str
@@ -49,4 +54,4 @@ class UpdateAssignment(BaseModel):
 
 class DeleteAssignment(BaseModel):
     assignment_id: int
-    
+
