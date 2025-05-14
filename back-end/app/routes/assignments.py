@@ -146,15 +146,18 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
 #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
 #     return new_assignment
 
-# @router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
-# def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
-#     if not checkCode(code):
-#         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-#     if not verifyTeacher(tokenData.id):
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
-#     if not userInClass(tokenData.id,code):
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-#     del_assignment = sqlQuery("DELETE FROM assignments WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
-#     if not del_assignment:
-#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No assignments were deleted")
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant Update assigments')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    del_written_assignment = sqlQuery("DELETE FROM written WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
+    del_frq_assignment = sqlQuery("DELETE FROM frq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
+    del_mcq_assignment = sqlQuery("DELETE FROM mcq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
+    del_tfq_assignment = sqlQuery("DELETE FROM tfq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
+    if not del_written_assignment and not del_frq_assignment and not del_mcq_assignment and not del_tfq_assignment:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No assignments were deleted")
 
