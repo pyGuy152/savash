@@ -52,5 +52,8 @@ uvicorn app.main:app
 ### Frontend Setup
 ```bash
 cd front-end
+npm i
+npm run build
+npm run start
 ```
 
