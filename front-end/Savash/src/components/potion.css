@@ -19,7 +19,7 @@ body{
     background: url("/potion-back.png");
     background-size: 120px 120px;
     background-position: -15px 0px;
-
+    transition: filter 3s;
 }
 
 #potion:hover{
@@ -53,12 +53,13 @@ body{
     position: absolute;
     top: 100vh;
     z-index: 9999;
+    border: dashed 5px rgb(226, 221, 207);
 }
 
 .bubble-title{
     position: absolute;
     left: 25vw;
-    font-size: 3rem;
+    font-size: 8rem;
     text-align: center;
     color: aliceblue;
     top: 100vh;
@@ -67,11 +68,59 @@ body{
 
 @keyframes bubble {
     from{
-        top: 100vh;
+        top: 120vh;
         opacity: 1;
     }
     to{
-        top: -200px;
+        top: -400px;
         opacity: 0.3;
     }
+}
+
+.pendulum{
+    position: absolute;
+    top: -50%;
+    transform-origin: 50% -10%;
+    left: 40svw;
+    rotate: -90deg;
+}
+
+.pendulum-charm{
+    position: absolute;
+    transform-origin: 50% -10%;
+    top: -50%;
+    left: 40svw;
+    rotate: -90deg;
+    filter: none;
+}
+
+.swing{
+    animation: swing 3s 2 ease-in-out;
+    filter: hue-rotate(90deg);
+    transition: filter 3s;
+}
+
+@keyframes swing{
+    0%{
+        rotate: -90deg;
+    }
+    50%{
+        rotate: 90deg;
+    }
+    100%{
+        rotate: -90deg;
+    }
+}
+
+.procras{
+    position: absolute;
+    right: 0px;
+    bottom: 80px;
+    cursor: default;
+    opacity: 0;
+    transition: opacity 0.5s;
+} 
+
+.procras.show{
+    opacity: 1;
 }
