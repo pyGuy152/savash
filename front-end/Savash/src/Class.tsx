@@ -5,7 +5,7 @@ import ClassNav from "./components/ClassNav";
 
 const apiUrl = "https://api.codewasabi.xyz";
 
-import { Assignment, Class, getToken, LOGOUT, Tab } from "./types.ts"
+import { Assignment, Class, getToken, Tab } from "./types.ts"
 import { useEffect, useRef, useState } from "react";
 
 import "./Register.css";
@@ -57,11 +57,11 @@ function ClassComponent(){
             let dateParsed = data;
             setClassData(dateParsed);
           })
-          .catch((err) => {
-            alert(err);
-            LOGOUT();
-            navigate("/");
-            console.error(err);
+          .catch(() => {
+            // alert(err);
+            // LOGOUT();
+            // navigate("/");
+            // console.error(err);
           });
       }
 
@@ -89,11 +89,11 @@ function ClassComponent(){
             console.log(data);
             setAssignments(dataParsed);
           })
-          .catch((err) => {
-            alert(err);
-            LOGOUT();
-            navigate("/");
-            console.error(err);
+          .catch(() => {
+            // alert(err);
+            // LOGOUT();
+            // navigate("/");
+            // console.error(err);
           });
       }
 

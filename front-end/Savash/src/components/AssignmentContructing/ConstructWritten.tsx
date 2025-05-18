@@ -9,11 +9,15 @@ function ConstructWritten({
   setAssignmentData,
   assignmentData,
 }: ConstructWrittenProps) {
+  
+  function pointsHandler(e: { target: { value: any } }) {
+    setAssignmentData({ ...assignmentData, points: e.target.value });
+  }
   return (
     <div className="assignment-specific">
       <label htmlFor="points">Assignment Weight:</label>
       <input
-        onChange={(n) => setAssignmentData({...assignmentData, points:n})}
+        onChange={pointsHandler}
         type="number"
         id="points"
       />

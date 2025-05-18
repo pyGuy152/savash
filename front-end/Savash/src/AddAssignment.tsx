@@ -26,8 +26,7 @@ function AddAssignment() {
 
     const navigate = useNavigate();
 
-    function submitForm(event: React.FormEvent<HTMLFormElement>) {
-      event.preventDefault();
+    function submitForm() {
       const nameElem = document.getElementById("name") as HTMLInputElement;
       const dueElem = document.getElementById("due") as HTMLInputElement;
       const descElem = document.getElementById("desc") as HTMLInputElement;
@@ -65,7 +64,7 @@ function AddAssignment() {
       });
     }
 
-    const [assignmentData, setAssignmentData] = useState<Assignment>();
+    const [assignmentData, setAssignmentData] = useState<Assignment>({points: 0});
 
     const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"];
     const sliderElems = [
@@ -82,7 +81,7 @@ function AddAssignment() {
     return (
       <div>
         <TeacherNav />
-        <form className="Register" onSubmit={submitForm}>
+        <form className="Register" onSubmit={(e) => e.preventDefault()}>
           <h2>Create Assignment</h2>
           <label htmlFor="name">Name:</label>
           <input type="text" name="name" id="name" required />
@@ -92,11 +91,9 @@ function AddAssignment() {
           <input type="date" id="due" required />
           <hr />
           <Slider options={sliderOptions} setSelectedType={setSelectedType} />
-          {
-            sliderElems[selectedType]
-          }
-          <button type="submit" className="submit">
-            Register
+          {sliderElems[selectedType]}
+          <button onClick={submitForm} type="submit" className="submit">
+            Publish
           </button>
         </form>
       </div>

@@ -1,0 +1,77 @@
+
+div.content{
+    height: 500px;
+    width: 100%;
+}
+
+body{
+    transition: filter 3s;
+}
+
+#potion{
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    animation: scale 1s infinite;
+    cursor: pointer;
+    background: url("/potion-back.png");
+    background-size: 120px 120px;
+    background-position: -15px 0px;
+
+}
+
+#potion:hover{
+    animation: none;
+    scale: 1.3;
+}
+
+@keyframes scale{
+    0%{
+        scale: 1;
+        background-size: 100px 100px;
+        background-position: -5px 10px;
+    }
+    50%{
+        scale: 1.2;
+        background-size: 150px 150px;
+        background-position: -30px -10px;
+    }
+    100%{
+        scale: 1;
+        background-size: 100px 100px;
+        background-position: -5px 10px;
+    }
+}
+
+.bubble{
+    width: 50px;
+    height: 50px;
+    background-color: aliceblue;
+    border-radius: 50px;
+    position: absolute;
+    top: 100vh;
+    z-index: 9999;
+}
+
+.bubble-title{
+    position: absolute;
+    left: 25vw;
+    font-size: 3rem;
+    text-align: center;
+    color: aliceblue;
+    top: 100vh;
+}
+
+
+@keyframes bubble {
+    from{
+        top: 100vh;
+        opacity: 1;
+    }
+    to{
+        top: -200px;
+        opacity: 0.3;
+    }
+}

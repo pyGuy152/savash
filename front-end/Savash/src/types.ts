@@ -44,7 +44,7 @@ export async function getAllClasses(){
   })
     .then((res) => res.json())
     .then((data) => {
-      if (!data || data.length == 0) {
+      if (!data || data.length == 0 || !Array.isArray(data)) {
         return;
       }
       console.log(data);
