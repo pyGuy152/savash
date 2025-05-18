@@ -14,7 +14,7 @@ hr{
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    background-color: var(--backgroundColor);
+    background-color: var(--midColor);
 }
 
 .assignment-specific .questions h2{
@@ -26,4 +26,46 @@ hr{
     font-size: 1.5rem;
     padding: 10px 20px;
     background-color: var(--submitColor);
+}
+
+.mcq{
+    background-color: var(--backgroundColor);
+    border-top: solid 5px white;
+}
+
+.questions{
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0;
+}
+
+.question{
+    padding: 20px;
+}
+
+.question-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--midColor);
+    padding: 10px;
+}
+
+.question-header h2{
+    margin: 0;
+}
+
+.question-header input{
+    margin: 0 0 0 20px;
+}
+
+.choices{
+    display: flex;
+    flex-direction: column;
+}    
+
+
+.choice input{
+    width: calc(100% - 45px);
 }

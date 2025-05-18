@@ -64,7 +64,11 @@ function AddAssignment() {
       });
     }
 
-    const [assignmentData, setAssignmentData] = useState<Assignment>({points: 0});
+    const [assignmentData, setAssignmentData] = useState<Assignment>({
+      points: 0,
+      questions: [],
+      choices: []
+      });
 
     const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"];
     const sliderElems = [
