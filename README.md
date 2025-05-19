@@ -52,8 +52,9 @@ uvicorn app.main:app
 ### Frontend Setup
 ```bash
 cd front-end
+cd Savash
 npm i
 npm run build
-npm run start
+npm run dev
 ```
 
