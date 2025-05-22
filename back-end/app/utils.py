@@ -70,3 +70,11 @@ def getSubmissionFile(file_name,file_path):
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
     print(f"File downloaded successfully to {file_path}")
+
+def askAI(prompt):
+    headers = {"Content-Type":"application/json"}
+    data = {'messages':[{"role": "user", "content": prompt}]}
+    response = requests.post("https://ai.hackclub.com/chat/completions",headers=headers,json=data)
+    response.raise_for_status()
+    output = response.json()
+    return output['choices'][0]['message']['content']
