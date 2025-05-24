@@ -55,21 +55,24 @@ def getSubmissionsFolder():
     response = requests.get("https://hackclub.maksimmalbasa.in.rs/api/v1/folder/1bb83e90e26a87f359f375091056aa93",headers=headers)
     return response.json()
 
-def uploadSubmissionFile(path):
+def uploadSubmissionFile(file_name, byte_content, file_type):
     headers = {'X-API-Key':file_api}
-    with open(path, 'rb') as f:
-        file = {'file': (f.name, f, 'text/plain')}
-        response = requests.post("https://hackclub.maksimmalbasa.in.rs/api/v1/upload?folderId=1bb83e90e26a87f359f375091056aa93",files=file,headers=headers)
+    file = {'file': (file_name, byte_content, file_type)}
+    response = requests.post("https://hackclub.maksimmalbasa.in.rs/api/v1/upload?folderId=1bb83e90e26a87f359f375091056aa93",files=file,headers=headers)
+    response.raise_for_status()
     return response.json()
 
 def getSubmissionFile(file_name,file_path):
-    headers = {'X-API-Key':file_api}
-    response = requests.get(f"https://hackclub.maksimmalbasa.in.rs/api/v1/file/1bb83e90e26a87f359f375091056aa93:{file_name}",stream=True,headers=headers)
-    response.raise_for_status()
-    with open(file_path,"wb") as f:
-        for chunk in response.iter_content(chunk_size=8192):
-            f.write(chunk)
-    print(f"File downloaded successfully to {file_path}")
+    try:
+        headers = {'X-API-Key':file_api}
+        response = requests.get(f"https://hackclub.maksimmalbasa.in.rs/api/v1/file/1bb83e90e26a87f359f375091056aa93:{file_name}",stream=True,headers=headers)
+        response.raise_for_status()
+        with open(file_path,"wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        return True
+    except:
+        return False
 
 def askAI(prompt):
     headers = {"Content-Type":"application/json"}
