@@ -69,11 +69,13 @@ def get_all_classes(tokenData = Depends(oauth2.get_current_user)):
 
 @router.post("/{code}/invite")
 def invite_user_to_class(code:int,inviteData:classes_schemas.ClassUsers, tokenData = Depends(oauth2.get_current_user)):
+    if not userInClass(tokenData.id, code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not in class')
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(inviteData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwner(code,tokenData.id):
+    if not verifyTeacher(tokenData.id):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to add users to this class")
     if int(getUserId(inviteData.email)) == int(tokenData.id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="User tried to add themself")
