@@ -24,7 +24,8 @@ function ClassNav({ classSelected, inviteModalToggle }: ClassNavProps) {
         </li>
       </ul>
       <ul className="right">
-        <li>
+        {
+          localStorage.getItem("role") === 'teacher' ? (<><li>
           <Link to="./add">
             <button className="register gray">Add Assignment</button>
           </Link>
@@ -33,7 +34,11 @@ function ClassNav({ classSelected, inviteModalToggle }: ClassNavProps) {
           <button onClick={inviteModalToggle} className="register">
             Invite
           </button>
-        </li>
+        </li></>) : 
+        (<>
+          
+        </>)
+        }
       </ul>
     </nav>
   );

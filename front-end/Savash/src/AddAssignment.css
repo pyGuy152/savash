@@ -65,7 +65,15 @@ hr{
     flex-direction: column;
 }    
 
+.choice{
+    display: flex;
+    flex-direction: row;
+}
+.choice input[type="checkbox"]{
+    width: 10px !important;
+    background-color: red;
+}
 
 .choice input{
-    width: calc(100% - 45px);
+    flex: 1;
 }

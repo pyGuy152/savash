@@ -8,7 +8,7 @@ interface InviteModalProps {
   closeModal: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-function InviteModal({code, closeModal}: InviteModalProps) {
+function InviteModal({ code, closeModal }: InviteModalProps) {
   const navigate = useNavigate();
 
   function submitForm(event: React.FormEvent<HTMLFormElement>) {
@@ -20,14 +20,14 @@ function InviteModal({code, closeModal}: InviteModalProps) {
       alert("Please enter a valid email address.");
       return;
     }
-    const data = { email, code };
+    const data = { email };
     console.log(apiUrl);
-    fetch(apiUrl + "/classes/add", {
+    fetch(apiUrl + "/classes/" + code + "/invite/", {
       body: JSON.stringify(data),
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "bearer " + getToken(document.cookie)
+        Authorization: "bearer " + getToken(document.cookie),
       },
     }).then(() => {
       navigate("/login");
@@ -51,7 +51,9 @@ function InviteModal({code, closeModal}: InviteModalProps) {
           Invite
         </button>
       </form>
-      <button className="close" onClick={closeModal}>Close</button>
+      <button className="close" onClick={closeModal}>
+        Close
+      </button>
     </div>
   );
 }

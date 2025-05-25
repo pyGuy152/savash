@@ -7,6 +7,7 @@ import ConstructWritten from "./components/AssignmentContructing/ConstructWritte
 
 import "./AddAssignment.css"
 import ConstructMCQ from "./components/AssignmentContructing/ConstructMCQ.tsx";
+import ConstructFRQ from "./components/AssignmentContructing/ConstructFRQ.tsx";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
@@ -25,6 +26,13 @@ function AddAssignment() {
     }
 
     const navigate = useNavigate();
+
+    const [assignmentData, setAssignmentData] = useState<Assignment>({
+      points: 0,
+      questions: [],
+      choices: []
+      });
+
 
     function submitForm() {
       const nameElem = document.getElementById("name") as HTMLInputElement;
@@ -50,9 +58,37 @@ function AddAssignment() {
         description = "There is no information about this assignment.";
       }
       
-      const data = { title: name, due_date, description };
+      let data : Assignment = { title: name, due_date, description, points: 0, created_at: new Date()};
+      let type = "";
+
+      switch(selectedType){
+        case 0:
+          data.points = assignmentData.points;
+          type = "written";
+          break;
+        case 1:
+          data.points = assignmentData.points;
+          data.choices = assignmentData.choices;
+          data.questions = assignmentData.questions;
+          data.correct_answer = data.correct_answer;
+          type = "mcq";
+          break;
+        case 2:
+          data.points = assignmentData.points;
+          data.questions = assignmentData.questions;
+          type = "frq";
+          break;
+        case 3:
+          data.points = assignmentData.points;
+          data.questions = assignmentData.questions;
+          data.choices = assignmentData.choices;
+          data.correct_answer = data.correct_answer;
+          type = "tfq";
+          break;
+      }
+      
       console.log(data);
-      fetch(apiUrl + "/classes/" + code + "/assignments/", {
+      fetch(apiUrl + "/classes/" + code + "/assignments/" + type + "/", {
         body: JSON.stringify(data),
         method: "POST",
         headers: {
@@ -61,15 +97,12 @@ function AddAssignment() {
         },
       }).then(() => {
         navigate("/class/"+code);
+      }).catch((err) => {
+        console.log(err);
       });
     }
 
-    const [assignmentData, setAssignmentData] = useState<Assignment>({
-      points: 0,
-      questions: [],
-      choices: []
-      });
-
+    
     const sliderOptions = ["Written", "MCQ", "FRQ", "TFQ"];
     const sliderElems = [
       <ConstructWritten
@@ -80,6 +113,10 @@ function AddAssignment() {
         setAssignmentData={setAssignmentData}
         assignmentData={assignmentData}
       />,
+      <ConstructFRQ
+        setAssignmentData={setAssignmentData}
+        assignmentData={assignmentData}
+      />
     ];
 
     return (
@@ -104,4 +141,4 @@ function AddAssignment() {
     );
 }
 
-export default AddAssignment;
+export default AddAssignment; 
