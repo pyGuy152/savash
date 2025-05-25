@@ -85,3 +85,24 @@ def check_user(email: str):
         return False
     else:
         return True
+
+def getUsername(id):
+    user = sqlQuery("SELECT * FROM users WHERE user_is = %s;",(id,))
+    if not user:
+        return None
+    else:
+        return user["username"] # type: ignore
+
+def postInClass(id,code):
+    post = sqlQuery("SELECT * FROM posts WHERE post_id = %s AND code = %s;",(id,code,))
+    if not post:
+        return False
+    else:
+        return True
+
+def checkPostOwner(user_id, post_id):
+    post = sqlQuery("SELECT * FROM posts WHERE user_id = %s AND post_id = %s;",(user_id,post_id,))
+    if not post:
+        return False
+    else:
+        return True

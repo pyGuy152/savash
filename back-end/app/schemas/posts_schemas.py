@@ -4,8 +4,8 @@ from enum import Enum
 from datetime import datetime
 
 class AddPost(BaseModel):
-    tile : str
-    description: str
+    title : str
+    content: str
 
 class PostOut(BaseModel):
     post_id: int
