@@ -1,5 +1,4 @@
 from typing import List
-from xmlrpc.client import boolean
 from fastapi import APIRouter, status, HTTPException, Depends
 from .. import oauth2
 from ..schemas import assignments_schemas
@@ -23,7 +22,7 @@ def validateTfq(data):
         if not(len(data.questions) == len(data.correct_answer)):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure questions and correct_answer are the same length')
         for i in data.correct_answer:
-            if not(isinstance(i, boolean)):
+            if not(isinstance(i, bool)):
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure the choices are booleans')
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)

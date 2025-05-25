@@ -9,3 +9,4 @@ router = APIRouter(prefix="/posts",tags=['Posts'])
 @router.get("/")
 def hello():
     return {'message':'hello'}
+

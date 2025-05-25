@@ -1,6 +1,7 @@
 .env
 venv
 .vscode
+back-end/app/__pycache__
 back-end/app/routes/__pycache__
 back-end/app/schemas/__pycache__
-back-end/app/__pycache__
+back-end/app/temp_files
