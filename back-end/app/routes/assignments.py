@@ -3,54 +3,10 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from .. import oauth2
 from ..schemas import assignments_schemas
 from ..utils import sqlQuery
+from ..sql_verification import checkCode, validateMcq, validateCodeing, validateTfq, verifyTeacher, userInClass
 import random
 
 router = APIRouter(prefix='/classes/{code}/assignments',tags=['Assignments'])
-
-def validateMcq(data):
-    try:
-        if not(len(data.questions) == len(data.choices) and len(data.questions) == len(data.correct_answer)):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Make sure questions, correct_answer, and choices are all the same length')
-        for i in data.choices:
-            if not (len(i) >= 2 and len(i) <= 4 and isinstance(i, list)):
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure choices is a 2d array with the length of choices ranging from 2 to 4')
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-
-def validateTfq(data):
-    try:
-        if not(len(data.questions) == len(data.correct_answer)):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure questions and correct_answer are the same length')
-        for i in data.correct_answer:
-            if not(isinstance(i, bool)):
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Make sure the choices are booleans')
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-
-def validateCodeing(data):
-    try:
-        if not(len(data.input) == len(data.output)):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure input and output are the same length')
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-
-def verifyTeacher(id):
-    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
-    if not x or x == None:
-        return False
-    return True
-
-def userInClass(id,code):
-    x = sqlQuery("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
-    if not x or x == None:
-        return False
-    return True
-
-def checkCode(code):
-    x = sqlQuery("SELECT * FROM class WHERE code = %s;",(str(code),))
-    if not x or x == None:
-        return False
-    return True
 
 def getNewAssignmentId():
     id = str(random.randint(0,1000000))

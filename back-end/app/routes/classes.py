@@ -4,51 +4,11 @@ import random
 from .. import oauth2
 from ..schemas import classes_schemas
 from ..utils import sqlQuery
+from ..sql_verification import checkCode, verifyTeacher, userInClass, checkEmail, getUserId, verifyOwner, checkIfInvited
 
 
 router = APIRouter(prefix='/classes',tags=['Classes'])
 
-def checkCode(code):
-    x = sqlQuery("SELECT * FROM class WHERE code = %s;",(str(code),))
-    if not x or x == None:
-        return False
-    return True
-
-def checkEmail(email):
-    x = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
-    if not x or x == None:
-        return False
-    return True
-
-def getUserId(email):
-    user = sqlQuery("SELECT user_id FROM users WHERE email = %s;",(str(email),))
-    if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="not a valid email")
-    return user['user_id'] # type: ignore
-
-def verifyTeacher(id):
-    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
-    if not x or x == None:
-        return False
-    return True
-
-def verifyOwner(code,id):
-    x = sqlQuery("SELECT * FROM class WHERE owner = %s AND code = %s;",(id,code,))
-    if not x or x == None:
-        return False
-    return True
-
-def checkIfInvitedT(code,id):
-    x = sqlQuery("SELECT * FROM users WHERE %s = ANY(join_req) AND user_id = %s AND role = 'teacher';", (code,id,))
-    if not x or x == None:
-        return False
-    return True
-
-def userInClass(id,code):
-    x = sqlQuery("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
-    if not x or x == None:
-        return False
-    return True
 
 @router.post("/", response_model=classes_schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
@@ -123,7 +83,7 @@ def delete_class(code:int ,tokenData = Depends(oauth2.get_current_user)):
 def join_a_class(code: int, tokenData = Depends(oauth2.get_current_user)):
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
-    if not verifyTeacher(tokenData.id) or checkIfInvitedT(code,tokenData.id):
+    if not verifyTeacher(tokenData.id) or checkIfInvited(code,tokenData.id):
         relation = sqlQuery("INSERT INTO user_class (user_id,code) VALUES (%s, %s) RETURNING *;",(tokenData.id,code,))
         removed_invite = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE user_id = %s RETURNING *;",(code,tokenData.id))
         return relation

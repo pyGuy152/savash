@@ -3,15 +3,9 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from .. import utils, oauth2
 from ..schemas import users_schemas
 from ..utils import sqlQuery
+from ..sql_verification import check_user
 
 router = APIRouter(prefix='/users',tags=['Users'])
-
-def check_user(email: str):
-    user = sqlQuery("SELECT * FROM users WHERE email = %s;",(email,))
-    if not user:
-        return False
-    else:
-        return True
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=users_schemas.UserOut)
 def make_user(user_cred: users_schemas.UserCreate):

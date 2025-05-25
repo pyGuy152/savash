@@ -4,30 +4,10 @@ from fastapi.responses import FileResponse, StreamingResponse
 from .. import oauth2
 from ..schemas import assignments_schemas
 from ..utils import sqlQuery, uploadSubmissionFile, getSubmissionFile, deleteSubmissionFile
+from ..sql_verification import assignmentInClass, userInClass, verifyTeacher
 import random, os
 
 router = APIRouter(prefix='/classes/{code}/assignments/{id}/submit',tags=['Submit'])
-
-def userInClass(id,code):
-    x = sqlQuery("SELECT * FROM user_class WHERE user_id = %s AND code = %s;",(id,code,))
-    if not x or x == None:
-        return False
-    return True
-
-def assignmentInClass(id,code):
-    w = sqlQuery("SELECT * FROM written WHERE assignment_id = %s AND code = %s;",(id,code,))
-    f = sqlQuery("SELECT * FROM frq WHERE assignment_id = %s AND code = %s;",(id,code,))
-    m = sqlQuery("SELECT * FROM mcq WHERE assignment_id = %s AND code = %s;",(id,code,))
-    t = sqlQuery("SELECT * FROM tfq WHERE assignment_id = %s AND code = %s;",(id,code,))
-    if not w and not f and not m and not t:
-        return False
-    return True
-
-def verifyTeacher(id):
-    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
-    if not x or x == None:
-        return False
-    return True
 
 @router.post("/written")
 async def upload_written_submissions(code: int, id: int ,file : UploadFile = File(...), tokenData = Depends(oauth2.get_current_user)):
