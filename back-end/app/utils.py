@@ -62,17 +62,18 @@ def uploadSubmissionFile(file_name, byte_content, file_type):
     response.raise_for_status()
     return response.json()
 
-def getSubmissionFile(file_name,file_path):
-    try:
-        headers = {'X-API-Key':file_api}
-        response = requests.get(f"https://hackclub.maksimmalbasa.in.rs/api/v1/file/1bb83e90e26a87f359f375091056aa93:{file_name}",stream=True,headers=headers)
-        response.raise_for_status()
-        with open(file_path,"wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
-        return True
-    except:
-        return False
+def getSubmissionFile(file_name):
+    headers = {'X-API-Key':file_api}
+    response = requests.get(f"https://hackclub.maksimmalbasa.in.rs/api/v1/file/1bb83e90e26a87f359f375091056aa93:{file_name}",stream=True,headers=headers)
+    response.raise_for_status()
+    content_type = response.headers.get('Content-Type', 'application/octet-stream')
+    return (response, content_type)
+
+def deleteSubmissionFile(file_name):
+    headers = {'X-API-Key':file_api}
+    response = requests.delete(f"https://hackclub.maksimmalbasa.in.rs/api/v1/delete/1bb83e90e26a87f359f375091056aa93/{file_name}",stream=True,headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 def askAI(prompt):
     headers = {"Content-Type":"application/json"}

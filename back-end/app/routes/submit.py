@@ -1,9 +1,9 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from .. import oauth2
 from ..schemas import assignments_schemas
-from ..utils import sqlQuery, uploadSubmissionFile, getSubmissionFile
+from ..utils import sqlQuery, uploadSubmissionFile, getSubmissionFile, deleteSubmissionFile
 import random, os
 
 router = APIRouter(prefix='/classes/{code}/assignments/{id}/submit',tags=['Submit'])
@@ -14,16 +14,49 @@ def userInClass(id,code):
         return False
     return True
 
+def assignmentInClass(id,code):
+    w = sqlQuery("SELECT * FROM written WHERE assignment_id = %s AND code = %s;",(id,code,))
+    f = sqlQuery("SELECT * FROM frq WHERE assignment_id = %s AND code = %s;",(id,code,))
+    m = sqlQuery("SELECT * FROM mcq WHERE assignment_id = %s AND code = %s;",(id,code,))
+    t = sqlQuery("SELECT * FROM tfq WHERE assignment_id = %s AND code = %s;",(id,code,))
+    if not w and not f and not m and not t:
+        return False
+    return True
+
+def verifyTeacher(id):
+    x = sqlQuery("SELECT * FROM users WHERE user_id = %s AND role = 'teacher'",(id,))
+    if not x or x == None:
+        return False
+    return True
+
 @router.post("/written")
-async def upload_written_submissions(code: int, id: int ,file : UploadFile = File(...)):
+async def upload_written_submissions(code: int, id: int ,file : UploadFile = File(...), tokenData = Depends(oauth2.get_current_user)):
+    if not assignmentInClass(id,code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'assignment with id {id} not in class with code {code}')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User not in class")
+    if not verifyTeacher(tokenData.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not a teacher")
     contents = await file.read()
+    x = sqlQuery("SELECT * FROM submissions WHERE assignment_id = %s;",(id,))
     response = uploadSubmissionFile(file.filename, contents, file.content_type)
-    out = sqlQuery("INSERT INTO submissions (user_id, assignment_id, submission_path, grade) VALUES (%s, %s, %s, %s) RETURNING *;",(21,id,response["files"][0]["name"],None,))
+    if x:
+        del_response = deleteSubmissionFile(x["submission_path"]) # type: ignore
+        if not del_response:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        out = sqlQuery("UPDATE submissions SET submission_path = %s WHERE assignment_id = %s RETURNING *;",(response["files"][0]["name"],id,))
+    else:
+        out = sqlQuery("INSERT INTO submissions (user_id, assignment_id, submission_path, grade) VALUES (%s, %s, %s, %s) RETURNING *;",(21,id,response["files"][0]["name"],None,))
     return out
 
 @router.get("/written")
-def get_written_submissions(code: int, id: int):
-    file_name = sqlQuery("SELECT * FROM submissions WHERE assignment_id = %s AND user_id = %s;",(id,21,))
+def get_written_submissions(code: int, id: int, tokenData = Depends(oauth2.get_current_user)):
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User not in class")
+    if not assignmentInClass(id,code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'assignment with id {id} not in class with code {code}')
+    file_name = sqlQuery("SELECT * FROM submissions WHERE assignment_id = %s AND user_id = %s;",(id,tokenData.id,))
     if file_name:
-        if getSubmissionFile(file_name=file_name["submission_path"],file_path=f'app/temp_files/{file_name["submission_path"]}'): # type: ignore
-            return FileResponse(f'app/temp_files/{file_name["submission_path"]}') # type: ignore
+        x = getSubmissionFile(file_name=file_name["submission_path"]) # type: ignore
+        if x:
+            return StreamingResponse(x[0].iter_content(chunk_size=8192),media_type=x[1])
