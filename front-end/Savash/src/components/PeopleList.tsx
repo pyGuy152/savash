@@ -15,6 +15,7 @@ function PeopleList({classID}: PeopleListProp) {
 
     async function updatePeople(){
         let data = await getPeopleFromClass(classID);
+        data = data.sort((_: Person, b: Person) => b.role === "teacher" ? 1 : -1);
         if(data){ 
             setPeople(data);
         }

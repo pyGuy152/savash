@@ -13,7 +13,7 @@ function Inbox() {
   const [messages, setMessages] = useState<Number[]>([]);
 
   function loadMessages() {
-    fetch(apiUrl + "/users", {
+    fetch(apiUrl + "/users/", {
       method: "GET",
       headers: {
         Authorization: "bearer " + getToken(document.cookie),

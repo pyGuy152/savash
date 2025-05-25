@@ -1,4 +1,4 @@
-import { MouseEvent, ReactEventHandler } from "react";
+import { MouseEvent } from "react";
 import { Assignment } from "../../types";
 
 interface ConstructMCQProps {
@@ -50,6 +50,20 @@ function ConstructMCQ({
 
     setAssignmentData({
       ...assignmentData,
+      choices,
+    });
+  }
+
+  function addQuestion() {
+    const questions = assignmentData.questions
+      ? [...assignmentData.questions]
+      : [];
+    const choices = makeCopy();
+    questions.push("");
+    choices.push(["", "", "", ""]);
+    setAssignmentData({
+      ...assignmentData,
+      questions,
       choices,
     });
   }

@@ -69,3 +69,18 @@ ul{
 .HomeNav .gray {
     background-color: var(--midColor);
 }
+
+.HomeNav .inbox{
+    position: relative;
+}
+
+.HomeNav .inbox.new ::after{
+    content: "";
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    border-radius: 50%;
+    background-color: red;
+}

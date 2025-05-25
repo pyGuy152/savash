@@ -1,6 +1,7 @@
 
 
-import { LOGOUT } from "../types";
+import { useEffect, useRef } from "react";
+import { apiUrl, getToken, LOGOUT } from "../types";
 import "./HomeNav.css";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -10,11 +11,31 @@ import { Link, useNavigate } from "react-router-dom";
 
 function TeacherNav() {
   const navigate = useNavigate();
+  const inboxIcon = useRef(null);
 
   function handleLogout(){
     LOGOUT();
     navigate("/");
   }
+
+  function newMessage(){
+      fetch(apiUrl + "/users/", {
+          method: "GET",
+          headers: {
+            Authorization: "bearer " + getToken(document.cookie),
+          },
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data);
+            if (!data || data.join_req.length === 0) {
+              (inboxIcon.current! as HTMLUListElement).className = "inbox";
+            }
+            (inboxIcon.current! as HTMLUListElement).className = "inbox new";
+        });
+  }
+
+  useEffect(newMessage, [])
 
     return (
       <nav className="HomeNav">
@@ -30,7 +51,7 @@ function TeacherNav() {
           </li>
         </ul>
         <ul className="right">
-        <li>
+        <li className="inbox" ref={inboxIcon}>
            <Link to="/inbox">
                 <img className="icon" src="/icons/inbox.png"></img>
            </Link> 
