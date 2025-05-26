@@ -10,6 +10,7 @@ load_dotenv()
 db_user = os.getenv("DB_User")
 db_pass = os.getenv("DB_User_PASS")
 file_api = os.getenv("FILE_API")
+email_api = os.getenv("EMAIL_API")
 
 
 
@@ -82,3 +83,11 @@ def askAI(prompt):
     response.raise_for_status()
     output = response.json()
     return output['choices'][0]['message']['content']
+
+def createContact(email: str, name: str):
+    headers = {"Authorization": f"Bearer {email_api}"}
+    data = {"email":email, "firstName":name}
+    response = requests.post("https://app.loops.so/api/v1/contacts/create",headers=headers,json=data)
+    response.raise_for_status()
+    output = response.json()
+    return output

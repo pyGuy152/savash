@@ -2,8 +2,9 @@ from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
 from .. import utils, oauth2
 from ..schemas import users_schemas
-from ..utils import sqlQuery
+from ..utils import sqlQuery, createContact
 from ..sql_verification import check_user
+import requests
 
 router = APIRouter(prefix='/users',tags=['Users'])
 
@@ -15,6 +16,7 @@ def make_user(user_cred: users_schemas.UserCreate):
     new_user = sqlQuery("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     if not new_user['join_req']: # type: ignore
         new_user['join_req'] = [] # type: ignore
+    createContact(user_cred.email,user_cred.name.split(" ")[0])
     return new_user
 
 @router.get('/', response_model=users_schemas.UserOut)
