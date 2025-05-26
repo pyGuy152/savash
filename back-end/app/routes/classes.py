@@ -51,7 +51,7 @@ def remove_user_from_class(code:int,removeData:classes_schemas.ClassUsers, token
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if tokenData.id == getUserId(removeData.email):
+    if int(tokenData.id) == int(getUserId(removeData.email)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You cant remove yourself from the class')
     if not verifyOwner(code,tokenData.id) and (not(verifyTeacher(tokenData.id) and not verifyTeacher(getUserId(removeData.email)))):
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove this users from this class")
