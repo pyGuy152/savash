@@ -17,7 +17,7 @@ def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2
         code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     if verifyTeacher(tokenData.id):
         new_class = sqlQuery("INSERT INTO class (code, name, owner) VALUES (%s,%s,%s) RETURNING *;",(code,class_data.name,tokenData.id,))
-        sqlQuery("INSERT INTO user_class (user_id, code) VALUES (%s, %s);",(tokenData.id,code))
+        sqlQuery("INSERT INTO user_class (user_id, code) VALUES (%s, %s) RETURNING *;",(tokenData.id,code))
         return new_class
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to create a class")
