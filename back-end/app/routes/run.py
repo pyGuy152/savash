@@ -16,4 +16,3 @@ async def run_python_code(file : UploadFile = File(...), tokenData = Depends(oau
     os.remove(f"app/sandbox/{file.filename}")
     return out
 
-    

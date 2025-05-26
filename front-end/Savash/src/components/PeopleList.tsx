@@ -47,6 +47,7 @@ function PeopleList({classID}: PeopleListProp) {
           email: victim,
         }),
         headers: {
+          "Content-Type": "application/json",
           Authorization: "bearer " + getToken(document.cookie)
         }
       });
