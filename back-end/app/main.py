@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from typing import Optional
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 from .routes import auth, users, classes, assignments, posts, games, submit, run
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
@@ -18,7 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(classes.router)
@@ -31,3 +32,14 @@ app.include_router(games.router)
 @app.get('/')
 def root():
     return RedirectResponse('https://savash.rohanjain.xyz')
+
+@app.post("/email")
+async def receive_raw_email(request: Request):
+    body = await request.body()
+    import email
+    msg = email.message_from_bytes(body)
+    print(str(msg).split(";"))
+    for i in str(msg).split(";"):
+        if '"to":' in i:
+            print(i)
+    return {"status": "parsed raw email"}
