@@ -20,7 +20,6 @@ function ConstructMCQ({
       : [];
     return choices;
   }
-
   
 
   function removeQuestion(e: MouseEvent<HTMLButtonElement>, i: number) {
@@ -65,6 +64,18 @@ function ConstructMCQ({
       ...assignmentData,
       questions,
       choices,
+    });
+  }
+
+  function makeRight(i: number, j: number) {
+    const copy = assignmentData.correct_answer
+      ? [...assignmentData.correct_answer]
+      : [];
+    copy[i] = assignmentData.choices ? assignmentData.choices[i][j] : "Error";
+    console.log(copy);
+    setAssignmentData({
+      ...assignmentData,
+      correct_answer: copy,
     });
   }
 
@@ -116,7 +127,14 @@ function ConstructMCQ({
                       onChange={(e) => changeChoice(e, i, j)}
                       placeholder={"choice " + (j + 1)}
                     />
-                    <input type="checkbox"></input>
+                    <input
+                      onChange={() => makeRight(i, j)}
+                      checked={
+                        assignmentData.correct_answer && assignmentData.choices ? assignmentData.correct_answer[i] ===
+                        assignmentData.choices[i][j] : false
+                      }
+                      type="checkbox"
+                    ></input>
                   </li>
                 ))}
             </ol>

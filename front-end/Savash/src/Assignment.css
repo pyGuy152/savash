@@ -1,0 +1,58 @@
+
+
+.HomeNav .deleteAssignment{
+    background-color: var(--warningColor);
+}
+
+.assignmentOverview{
+    padding: 60px 45px;
+    line-height: 2rem;
+
+}
+
+.assignmentOverview h1{
+    margin: 0;
+    padding: 0;
+    font-size: 3rem;
+}
+
+.assignmentOverview p{
+    margin: 0px;
+    font-size: 1.5rem;
+    line-height: 1.5em;
+}
+
+.assignmentOverview .row{
+    align-items: last baseline;
+}
+
+.assignmentOverview hr{
+    margin-top: 0px;
+}
+
+.assignmentOverview .content{
+    padding: 20px;
+}
+
+.deleteModal{
+    top: 100px;
+    text-align: center;
+    background-color: var(--navColor);
+    border-radius: 15px;
+    border: none;
+    padding: 30px 40px;
+}
+
+.deleteModal::backdrop{
+    opacity: 0.4;
+    background-color: black;
+}
+
+.deleteModal h3{
+    color: var(--warningColor);
+    font-size: 1.5rem;
+}
+
+.deleteButton{
+    background-color: var(--warningColor);
+}

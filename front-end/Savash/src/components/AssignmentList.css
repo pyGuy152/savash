@@ -26,3 +26,8 @@
 .noAssignments {
     margin: 10px 20px;
 }
+
+.assignmentLink:hover{
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}

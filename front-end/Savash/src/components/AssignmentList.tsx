@@ -9,6 +9,7 @@ interface AssignmentListProps {
 
 import "./potion.css"
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 
 
 function AssignmentList({ list }:AssignmentListProps) {
@@ -56,7 +57,7 @@ function AssignmentList({ list }:AssignmentListProps) {
   }
 
 
-    if(list.length == 0){
+    if(list.length === 0){
       <>
         <ul className="assignment-list">
           <h2>No Assignments Yet.</h2>
@@ -96,7 +97,7 @@ function AssignmentList({ list }:AssignmentListProps) {
             <li key={i} className="row">
               <div className="left">
                 <img src="/icons/paperclip.png"></img>
-                <p>{row.title}</p>
+                <Link className="assignmentLink" to={`./assignment/${row.assignment_id}`}>{row.title}</Link>
               </div>
               <p>{row.due_date && row.due_date.toLocaleDateString()}</p>
             </li>

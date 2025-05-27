@@ -53,6 +53,12 @@ function Register() {
             }
         }).then(() => {
             navigate("/login");
+        })
+        .catch((err) => {
+          if(err){
+            alert(err);
+          }
+          navigate
         });
     }
 

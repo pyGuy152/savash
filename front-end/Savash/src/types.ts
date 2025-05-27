@@ -101,3 +101,18 @@ export interface Assignment{
   due_date? : Date;
   created_at? : Date;
 }
+
+export function findAssignmentType(data: Assignment){
+  if(data.correct_answer){
+    return "mcq";
+  }
+  else if(data.choices){
+    return "tfq"
+  }
+  else if(data.questions){
+    return "frq"
+  }
+  else{
+    return "written"
+  }
+}

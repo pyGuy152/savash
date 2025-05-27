@@ -14,6 +14,7 @@ import Inbox from './Inbox.tsx'
 import Class from './Class.tsx'
 import AddAssignment from './AddAssignment.tsx'
 import Contact from './Contact.tsx'
+import Assignment from './Assignment.tsx'
 
 //https://www.youtube.com/watch?v=oTIJunBa6MA&ab_channel=CosdenSolutions
 
@@ -44,32 +45,36 @@ const router = createBrowserRouter([
   },
   {
     path: "/create",
-    element: <CreateClass />
+    element: <CreateClass />,
   },
   {
     path: "/dashboard",
-    element: <Dashboard />
+    element: <Dashboard />,
   },
   {
     path: "/join",
-    element: <Join />
+    element: <Join />,
   },
   {
     path: "/inbox",
-    element: <Inbox />
+    element: <Inbox />,
   },
   {
     path: "/class/:id",
-    element: <Class />
+    element: <Class />,
   },
   {
     path: "/class/:id/add",
-    element: <AddAssignment />
+    element: <AddAssignment />,
   },
   {
     path: "/contact",
-    element: <Contact />
-  }
+    element: <Contact />,
+  },
+  {
+    path: "/class/:classid/assignment/:assignmentid",
+    element: <Assignment />
+  },
 ]);
 
 createRoot(document.getElementById('root')!).render(

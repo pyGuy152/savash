@@ -8,6 +8,7 @@ import ConstructWritten from "./components/AssignmentContructing/ConstructWritte
 import "./AddAssignment.css"
 import ConstructMCQ from "./components/AssignmentContructing/ConstructMCQ.tsx";
 import ConstructFRQ from "./components/AssignmentContructing/ConstructFRQ.tsx";
+import ConstructTFQ from "./components/AssignmentContructing/ConstructTFQ.tsx";
 
 const apiUrl = "https://api.codewasabi.xyz"
 
@@ -70,7 +71,7 @@ function AddAssignment() {
           data.points = assignmentData.points;
           data.choices = assignmentData.choices;
           data.questions = assignmentData.questions;
-          data.correct_answer = data.correct_answer;
+          data.correct_answer = assignmentData.correct_answer;
           type = "mcq";
           break;
         case 2:
@@ -81,8 +82,7 @@ function AddAssignment() {
         case 3:
           data.points = assignmentData.points;
           data.questions = assignmentData.questions;
-          data.choices = assignmentData.choices;
-          data.correct_answer = data.correct_answer;
+          data.correct_answer = assignmentData.correct_answer;
           type = "tfq";
           break;
       }
@@ -95,10 +95,10 @@ function AddAssignment() {
           "Content-Type": "application/json",
           Authorization: "bearer " + getToken(document.cookie)
         },
+      }).catch((err) => {
+        alert(err);
       }).then(() => {
         navigate("/class/"+code);
-      }).catch((err) => {
-        console.log(err);
       });
     }
 
@@ -116,7 +116,11 @@ function AddAssignment() {
       <ConstructFRQ
         setAssignmentData={setAssignmentData}
         assignmentData={assignmentData}
-      />
+      />,
+      <ConstructTFQ
+        setAssignmentData={setAssignmentData}
+        assignmentData={assignmentData}
+      />,
     ];
 
     return (
