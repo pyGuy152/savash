@@ -3,7 +3,7 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from .. import oauth2
 from ..schemas import assignments_schemas
 from ..utils import sqlQuery
-from ..sql_verification import checkCode, validateMcq, validateCodeing, validateTfq, verifyTeacher, userInClass
+from ..sql_verification import checkCode, validateMcq, validateCoding, validateTfq, verifyTeacher, userInClass, assignmentInClass
 import random
 
 router = APIRouter(prefix='/classes/{code}/assignments',tags=['Assignments'])
@@ -78,7 +78,7 @@ def create_tfq_assignment(code:int,data:assignments_schemas.TFQAssignment,tokenD
 
 @router.post("/coding", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
 def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,tokenData = Depends(oauth2.get_current_user)):
-    validateCodeing(data)
+    validateCoding(data)
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not verifyTeacher(tokenData.id):
@@ -119,6 +119,31 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
         tfq = [tfq]
 
     return written + mcq + frq + tfq
+
+@router.get("/{id}")
+def get_assignment_by_id(code: int, id: int, tokenData = Depends(oauth2.get_current_user)):
+    if not checkCode(code):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
+    if not userInClass(tokenData.id,code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
+    if not assignmentInClass(id,code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Assignment with id {id} not found in class")
+    written = sqlQuery("SELECT * FROM written WHERE code = %s AND assignment_id = %s;",(code,id,))
+    mcq = sqlQuery("SELECT * FROM mcq WHERE code = %s AND assignment_id = %s;",(code,id,))
+    frq = sqlQuery("SELECT * FROM frq WHERE code = %s AND assignment_id = %s;",(code,id,))
+    tfq = sqlQuery("SELECT * FROM tfq WHERE code = %s AND assignment_id = %s;",(code,id,))
+    
+    if written:
+        return written
+    elif mcq:
+        return mcq
+    elif frq:
+        return frq
+    elif tfq:
+        return tfq
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assignment not found")
+
 
 @router.put("/", response_model=assignments_schemas.AssignmentOut)
 def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenData = Depends(oauth2.get_current_user)):

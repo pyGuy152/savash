@@ -15,9 +15,6 @@ class AssignmentOut(BaseModel):
     assignment_id: int
     title: str
     description: str
-    questions: Optional[list] = None
-    choices: Optional[list] = None
-    correct_answer: Optional[list] = None
     points: Optional[int] = None
     due_date: Optional[datetime] = None
     created_at: datetime

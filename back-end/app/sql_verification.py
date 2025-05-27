@@ -45,7 +45,7 @@ def validateTfq(data):
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-def validateCodeing(data):
+def validateCoding(data):
     try:
         if not(len(data.input) == len(data.output)):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid request make sure input and output are the same length')
