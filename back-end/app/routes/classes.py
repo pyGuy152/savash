@@ -17,7 +17,7 @@ def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2
         code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
     if verifyTeacher(tokenData.id):
         new_class = sqlQuery("INSERT INTO class (code, name, owner) VALUES (%s,%s,%s) RETURNING *;",(code,class_data.name,tokenData.id,))
-        sqlQuery("INSERT INTO user_class (user_id, code) VALUES (%s, %s);",(tokenData.id,code))
+        sqlQuery("INSERT INTO user_class (user_id, code) VALUES (%s, %s) RETURNING *;",(tokenData.id,code))
         return new_class
     else:
         raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to create a class")
@@ -51,8 +51,10 @@ def remove_user_from_class(code:int,removeData:classes_schemas.ClassUsers, token
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
     if not checkEmail(removeData.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid email')
-    if not verifyOwner(code,tokenData.id):
-        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove users from this class")
+    if int(tokenData.id) == int(getUserId(removeData.email)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You cant remove yourself from the class')
+    if not verifyOwner(code,tokenData.id) and (not(verifyTeacher(tokenData.id) and not verifyTeacher(getUserId(removeData.email)))):
+        raise HTTPException(status.HTTP_403_FORBIDDEN,detail="You dont have permission to remove this users from this class")
     removed = sqlQuery("DELETE FROM user_class WHERE code = %s AND user_id = %s RETURNING *;",(code,getUserId(removeData.email),))
     removed_1 = sqlQuery("UPDATE users SET join_req = array_remove(join_req, %s) WHERE email = %s RETURNING *;",(code,removeData.email))
     if not removed_1 and not removed:

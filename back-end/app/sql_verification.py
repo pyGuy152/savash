@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from utils import sqlQuery
+from .utils import sqlQuery
 
 def checkEmail(email):
     x = sqlQuery("SELECT * FROM users WHERE email = %s;",(str(email),))
