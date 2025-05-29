@@ -3,6 +3,8 @@ import HomeNav from "./components/HomeNav";
 
 import "./Theme.css";
 
+import "./Classes.css"
+
 function Theme() {
   const [themeColors, setThemeColors] = useState(
     localStorage.getItem("theme")
@@ -107,6 +109,25 @@ function Theme() {
           </div>
         ))}
       </div>
+      <hr />
+      <ul className="class-samples">
+        <li className="class">
+          <div className="header">
+            <h2>Sample</h2>
+            <hr />
+            <p>5/29/2025</p>
+          </div>
+          <h2 className="code">1234567</h2>
+        </li>
+        <li className="class">
+          <div className="header">
+            <h2>Sample2</h2>
+            <hr />
+            <p>5/29/2025</p>
+          </div>
+          <h2 className="code">1234567</h2>
+        </li>
+      </ul>
       <hr />
       <p ref={exportArea} className="exportData"></p>
       <div className="custom">

@@ -33,3 +33,9 @@
     padding: 10px;
     word-break: break-all;
 }
+
+.class-samples{
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+}

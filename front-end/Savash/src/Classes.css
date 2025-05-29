@@ -19,6 +19,7 @@ h1{
     box-shadow: 0em 1em 2em #3333332c;
     transition: background-size 0.3s;
     background-size: 200% 200%;
+    cursor: pointer;
 }
 
 .class.loading {
