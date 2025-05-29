@@ -16,7 +16,7 @@ def make_user(user_cred: users_schemas.UserCreate):
     new_user = sqlQuery("INSERT INTO users (name, username, email, password, role) VALUES (%s,%s,%s,%s,%s) RETURNING *;",(user_cred.name,user_cred.username,user_cred.email,user_cred.password,user_cred.role,))
     if not new_user['join_req']: # type: ignore
         new_user['join_req'] = [] # type: ignore
-    createContact(user_cred.email,user_cred.name.split(" ")[0])
+    # createContact(user_cred.email,user_cred.name.split(" ")[0])
     return new_user
 
 @router.get('/', response_model=users_schemas.UserOut)

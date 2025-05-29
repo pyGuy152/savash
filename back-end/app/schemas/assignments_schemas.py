@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from itsdangerous import NoneAlgorithm
 from pydantic import BaseModel, EmailStr
 from enum import Enum
@@ -15,9 +15,6 @@ class AssignmentOut(BaseModel):
     assignment_id: int
     title: str
     description: str
-    questions: Optional[list] = None
-    choices: Optional[list] = None
-    correct_answer: Optional[list] = None
     points: Optional[int] = None
     due_date: Optional[datetime] = None
     created_at: datetime
@@ -26,20 +23,20 @@ class WrittenAssignment(AssignmentBase):
     pass
 
 class MCQAssignment(AssignmentBase):
-    questions: list
-    choices: list
-    correct_answer: list
+    questions: List[str]
+    choices: List[List[str]]
+    correct_answer: List[str]
 
 class FRQAssignment(AssignmentBase):
-    questions: list
+    questions: List[str]
 
 class TFQAssignment(AssignmentBase):
-    questions: list
-    correct_answer: list
+    questions: List[str]
+    correct_answer: List[str]
 
 class CodingAssignment(AssignmentBase):
-    input: list
-    output: list
+    input: List[str]
+    output: List[str]
 
 
 class UpdateAssignment(BaseModel):
