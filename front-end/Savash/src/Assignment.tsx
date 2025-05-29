@@ -1,6 +1,6 @@
 
-import { useRef, useState } from "react";
-import { Assignment } from "./types.ts"
+import { useEffect, useRef, useState } from "react";
+import { apiUrl, Assignment, getToken } from "./types.ts"
 
 import "./Assignment.css"
 import "./components/HomeNav.css"
@@ -8,17 +8,16 @@ import { Link, useParams } from "react-router-dom";
 
 function AssignmentPage() {
 
-    let [assignmentData] = useState<Assignment>({
-      title: "Hello",
-      points: 10,
-      description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Blanditiis, numquam ad. Id et magnam molestias. Necessitatibus cum neque sequi dolorem dolores pariatur officiis consectetur! Eius quo quos facilis minima veritatis.',
-        created_at: new Date(10000),
-        due_date: new Date()
-
+    let [assignmentData, setAssignmentData] = useState<Assignment>({
+      title: "Loading..",
+      points: 0,
+      description: "Contact us if this is taking too long...",
+      created_at: new Date(0),
+      due_date: new Date(),
     });
 
     let classID = useParams().classid
-    //let assignmentID = useParams().assignmentid;
+    let assignmentID = useParams().assignmentid;
 
     let modal = useRef<HTMLDialogElement>(null);
 
@@ -29,6 +28,28 @@ function AssignmentPage() {
     function closeModal(){
         modal.current!.close();
     }
+
+    useEffect(
+      () => {
+        fetch(`${apiUrl}/classes/${classID}/assignments/${assignmentID}`, {
+          method: "GET",
+          headers: {
+            Authorization: "bearer " + getToken(document.cookie)
+          },
+        }).then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          data = data as Assignment
+          if(data){
+            data.due_date = new Date(data.due_date);
+            data.created_at = new Date(data.created_at);
+
+            setAssignmentData(data);
+          }
+        })
+      }
+      ,[]
+    )
 
 
     if(localStorage.getItem("role") === "teacher"){
@@ -74,8 +95,14 @@ function AssignmentPage() {
                   <p>{assignmentData.points.toString()}/100 points</p>
                 </div>
                 <div className="row">
-                  <p>Created: {assignmentData.created_at!.toLocaleDateString()}</p>
-                  <p>Due By: {assignmentData.due_date!.toLocaleDateString()}</p>
+                  <p>
+                    Created: {assignmentData.created_at!.toLocaleDateString()}{" "}
+                    {assignmentData.created_at!.toLocaleTimeString()}
+                  </p>
+                  <p>
+                    Due By: {assignmentData.due_date!.toLocaleDateString()}{" "}
+                    {assignmentData.due_date!.toLocaleTimeString()}
+                  </p>
                 </div>
                 <hr></hr>
               </div>

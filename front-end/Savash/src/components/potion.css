@@ -11,7 +11,7 @@ body{
 #potion{
     width: 100px;
     height: 100px;
-    position: absolute;
+    position: fixed;
     right: 0px;
     bottom: 0px;
     animation: scale 1s infinite;
@@ -50,19 +50,19 @@ body{
     height: 50px;
     background-color: aliceblue;
     border-radius: 50px;
-    position: absolute;
-    top: 100vh;
+    position: fixed;
+    bottom: -10000px;
     z-index: 9999;
     border: dashed 5px rgb(226, 221, 207);
 }
 
 .bubble-title{
-    position: absolute;
+    position: fixed;
     left: 25vw;
     font-size: 8rem;
     text-align: center;
     color: aliceblue;
-    top: 100vh;
+    bottom: -10000px;
 }
 
 
@@ -78,7 +78,7 @@ body{
 }
 
 .pendulum{
-    position: absolute;
+    position: fixed;
     top: -50%;
     transform-origin: 50% -10%;
     left: 40svw;
@@ -86,7 +86,7 @@ body{
 }
 
 .pendulum-charm{
-    position: absolute;
+    position: fixed;
     transform-origin: 50% -10%;
     top: -50%;
     left: 40svw;
@@ -113,7 +113,7 @@ body{
 }
 
 .procras{
-    position: absolute;
+    position: fixed;
     right: 0px;
     bottom: 80px;
     cursor: default;

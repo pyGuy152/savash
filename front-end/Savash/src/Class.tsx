@@ -16,6 +16,7 @@ import "./Class.css"
 import AssignmentList from "./components/AssignmentList.tsx"
 import Tabs from "./components/Tabs.tsx";
 import PeopleList from "./components/PeopleList.tsx";
+import Posts from "./components/Posts.tsx";
 
 function ClassComponent(){
     const navigate = useNavigate();
@@ -85,7 +86,16 @@ function ClassComponent(){
                   assigned.due_date = new Date(assigned.due_date); 
                 }
             );
-            let dataParsed = data;
+            const today = new Date();
+            let dataParsed = data
+              .filter((a: Assignment) => a.due_date!.getTime() > today.getTime())
+              .sort(
+                (a: Assignment, b: Assignment) =>
+                  a.due_date!.getTime() - b.due_date!.getTime()
+              );
+            data.filter(
+              (a: Assignment) => a.due_date!.getTime() <= today.getTime()
+            ).forEach((a : Assignment) => dataParsed.push(a));
             console.log(data);
             setAssignments(dataParsed);
           })
@@ -112,14 +122,19 @@ function ClassComponent(){
         }
     }
 
-    const tabList : Tab[] = [{
-      title: "Assignments",
-      element: <AssignmentList list={assignments} />
-    },
-    {
-      title: "People",
-      element: <PeopleList classID={classID}/>
-    }
+    const tabList: Tab[] = [
+      {
+        title: "Assignments",
+        element: <AssignmentList list={assignments} />,
+      },
+      {
+        title: "People",
+        element: <PeopleList classID={classID} />,
+      },
+      {
+        title: "Posts",
+        element: <Posts classID={classID} />,
+      },
     ];
 
     return (

@@ -15,6 +15,7 @@ import Class from './Class.tsx'
 import AddAssignment from './AddAssignment.tsx'
 import Contact from './Contact.tsx'
 import Assignment from './Assignment.tsx'
+import Theme from './Theme.tsx'
 
 //https://www.youtube.com/watch?v=oTIJunBa6MA&ab_channel=CosdenSolutions
 
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
     element: <Join />,
   },
   {
+    path: "/theme",
+    element: <Theme />,
+  },
+  {
     path: "/inbox",
     element: <Inbox />,
   },
@@ -73,7 +78,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/class/:classid/assignment/:assignmentid",
-    element: <Assignment />
+    element: <Assignment />,
   },
 ]);
 

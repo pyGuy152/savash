@@ -1,0 +1,35 @@
+
+#presets{
+    padding: 5px 10px;
+    font-size: 1.3rem;
+    border-radius: 0;
+    border: none;
+}
+
+.color-select{
+    border: none;
+}
+
+.custom{
+    display: flex;
+    gap: 20px;
+    font-size: 1.3rem;
+    margin: 20px;
+}
+
+.custom #export{
+    background-color: var(--submitColor);
+}
+
+.custom #load{
+    background-color: var(--warningColor);
+}
+
+.exportData{
+    background-color: var(--navColor);
+    margin: 20px;
+    max-width: 60vw;
+    min-width: 0;
+    padding: 10px;
+    word-break: break-all;
+}

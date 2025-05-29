@@ -88,18 +88,42 @@ function AssignmentList({ list }:AssignmentListProps) {
         />
       </>;
     }
+
+    const today = new Date();
     
 
     return (
       <>
         <ul className="assignment-list">
+          <li className="row title-row">
+            <div className="left">
+              <b>Title</b>
+            </div>
+            <p>
+              <b>Due Date</b>
+            </p>
+          </li>
           {list.map((row, i) => (
             <li key={i} className="row">
               <div className="left">
                 <img src="/icons/paperclip.png"></img>
-                <Link className="assignmentLink" to={`./assignment/${row.assignment_id}`}>{row.title}</Link>
+                <Link
+                  className="assignmentLink"
+                  to={`./assignment/${row.assignment_id}`}
+                >
+                  {row.title}
+                </Link>
               </div>
-              <p>{row.due_date && row.due_date.toLocaleDateString()}</p>
+              <p
+                className={
+                  row.due_date!.getTime() < today.getTime() ? "overdue" : ""
+                }
+              >
+                {row.due_date &&
+                  row.due_date.toLocaleDateString() +
+                    " " +
+                    row.due_date.toLocaleTimeString()}
+              </p>
             </li>
           ))}
           <img

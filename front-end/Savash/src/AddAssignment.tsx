@@ -133,7 +133,7 @@ function AddAssignment() {
           <label htmlFor="desc">Description:</label>
           <input type="text" name="desc" id="desc" />
           <label htmlFor="due"></label>
-          <input type="date" id="due" required />
+          <input type="datetime-local" id="due" required />
           <hr />
           <Slider options={sliderOptions} setSelectedType={setSelectedType} />
           {sliderElems[selectedType]}

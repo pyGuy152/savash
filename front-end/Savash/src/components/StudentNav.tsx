@@ -5,7 +5,7 @@ import "./HomeNav.css";
 
 import { Link, useNavigate } from "react-router-dom";
 
-import { LOGOUT } from "../types.ts"
+import { loadTheme, LOGOUT } from "../types.ts"
 
 function StudentNav() {
   const navigate = useNavigate();
@@ -14,6 +14,8 @@ function StudentNav() {
     LOGOUT();
     navigate("/");
   }
+
+  loadTheme();
 
   return (
     <nav className="HomeNav">
@@ -25,7 +27,7 @@ function StudentNav() {
           <Link to="/contact">Contact</Link>
         </li>
         <li>
-          <Link to="/wiki">Wiki</Link>
+          <Link to="/theme">Theme</Link>
         </li>
       </ul>
       <ul className="right">

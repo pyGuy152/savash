@@ -1,7 +1,7 @@
 
 
 import { useEffect, useRef } from "react";
-import { apiUrl, getToken, LOGOUT } from "../types";
+import { apiUrl, getToken, loadTheme, LOGOUT } from "../types";
 import "./HomeNav.css";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +12,8 @@ import { Link, useNavigate } from "react-router-dom";
 function TeacherNav() {
   const navigate = useNavigate();
   const inboxIcon = useRef(null);
+
+  loadTheme();
 
   function handleLogout(){
     LOGOUT();
@@ -49,7 +51,7 @@ function TeacherNav() {
             <Link to="/contact">Contact</Link>
           </li>
           <li>
-            <Link to="/wiki">Wiki</Link>
+            <Link to="/theme">Theme</Link>
           </li>
         </ul>
         <ul className="right">

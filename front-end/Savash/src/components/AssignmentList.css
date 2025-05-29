@@ -1,35 +1,42 @@
-.assignment-list{
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
+.assignment-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.assignment-list .row{
-    border-bottom: 2px var(--navColor) solid;
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
-    align-items: center;
+.assignment-list .row {
+  border-bottom: 2px var(--navColor) solid;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  align-items: center;
 }
 
-.assignment-list .left{
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.assignment-list .left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.assignment-list img{
-    height: 32px;
+.assignment-list img {
+  height: 32px;
 }
 
 .noAssignments {
-    margin: 10px 20px;
+  margin: 10px 20px;
 }
 
-.assignmentLink:hover{
-    text-decoration: underline;
-    text-underline-offset: 5px;
+.assignmentLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.overdue {
+  color: var(--warningColor);
+}
+
+.assignment-list .title-row {
+  padding: 3px 50px;
+  font-size: 1.7rem;
+  text-decoration: underline;
 }

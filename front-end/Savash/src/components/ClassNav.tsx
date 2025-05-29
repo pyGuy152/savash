@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Class } from "../types";
+import { Class, loadTheme } from "../types";
 import "./HomeNav.css"
 
 interface ClassNavProps {
@@ -8,6 +8,8 @@ interface ClassNavProps {
 }
 
 function ClassNav({ classSelected, inviteModalToggle }: ClassNavProps) {
+
+  loadTheme();
   return (
     <nav className="HomeNav">
       <ul className="left">

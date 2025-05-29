@@ -1,8 +1,6 @@
 
 .tab-container {
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
     background-color: var(--navColor);
     margin: 20px;
     padding: 20px;
@@ -29,7 +27,6 @@
 
 .tab-content {
     background-color: var(--tabBackgroundColor);
-    min-height: 500px;
     border-radius: 15px;
 }
 
@@ -37,3 +34,6 @@
     display: none;
 }
 
+.tab-content .content{
+    height: fit-content;
+}

@@ -116,3 +116,18 @@ export function findAssignmentType(data: Assignment){
     return "written"
   }
 }
+
+export function loadTheme(){
+  let themeColorString = localStorage.getItem("theme");
+  if(themeColorString){
+    let themeColors = JSON.parse(themeColorString);
+      let str = "";
+      for (const key in themeColors) {
+        if (Object.prototype.hasOwnProperty.call(themeColors, key)) {
+          str += `--${key}: ${themeColors[key as keyof typeof themeColors]};`;
+        }
+      }
+      console.log(str);
+      document.body.style = str;
+  }
+}
