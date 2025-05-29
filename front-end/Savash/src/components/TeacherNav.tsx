@@ -31,7 +31,9 @@ function TeacherNav() {
             if (!data || data.join_req.length === 0) {
               (inboxIcon.current! as HTMLUListElement).className = "inbox";
             }
-            (inboxIcon.current! as HTMLUListElement).className = "inbox new";
+            else{
+              (inboxIcon.current! as HTMLUListElement).className = "inbox new";
+            }
         });
   }
 
@@ -70,3 +72,5 @@ function TeacherNav() {
 }
 
 export default TeacherNav;
+
+//wwwwwwwwwwwwdwwfwfwwwww

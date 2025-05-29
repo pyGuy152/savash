@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { apiUrl, getPeopleFromClass, getToken, Person } from "../types.ts";
 
+import "./ClassList.tsx";
+
 interface PeopleListProp {
     classID : number;
 }

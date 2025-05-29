@@ -11,7 +11,9 @@
 }
 
 .people-list{
-    color: var(--textColor)
+    color: var(--textColor);
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .person-row{
