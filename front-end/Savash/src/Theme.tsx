@@ -3,7 +3,7 @@ import HomeNav from "./components/HomeNav";
 
 import "./Theme.css";
 
-import "./Classes.css"
+import "./Classes.css";
 
 function Theme() {
   const [themeColors, setThemeColors] = useState(
@@ -29,7 +29,7 @@ function Theme() {
       }
     }
     console.log(str);
-    document.body.style = str;
+    document.body.setAttribute("style", str);
     localStorage.setItem("theme", JSON.stringify(themeColors));
   }, [themeColors]);
 

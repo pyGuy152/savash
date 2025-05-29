@@ -6,7 +6,7 @@ interface PostsProps{
 }
 
 function Posts({ classID } : PostsProps){
-
+    return <p>WIP, {"" + classID}</p>
 }
 
 export default Posts;

@@ -128,6 +128,6 @@ export function loadTheme(){
         }
       }
       console.log(str);
-      document.body.style = str;
+      document.body.setAttribute("style", str);
   }
 }
