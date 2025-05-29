@@ -5,7 +5,8 @@ import "./Theme.css";
 
 function Theme() {
   const [themeColors, setThemeColors] = useState(
-    localStorage.getItem("theme") ? JSON.parse(localStorage.getItem("theme")!)
+    localStorage.getItem("theme")
+      ? JSON.parse(localStorage.getItem("theme")!)
       : {
           backgroundColor: "#D9D9D9",
           textColor: "#000000",
@@ -44,6 +45,13 @@ function Theme() {
           warningColor: "#c70a0a",
         });
         break;
+      case "bean":
+        setThemeColors(
+          JSON.parse(
+            '{"backgroundColor":"#6e5e5e","textColor":"#3f3131","navColor":"#aa8d8d","submitColor":"#bfa982","tint":"#6f6f4d","tabBackgroundColor":"#ccccb5","midColor":"#a07979","warningColor":"#892f2f"}'
+          )
+        );
+        break;
       default:
         setThemeColors({
           backgroundColor: "#D9D9D9",
@@ -76,7 +84,7 @@ function Theme() {
         >
           <option value="default">Default</option>
           <option value="pink">Pink</option>
-          <option value="dark">Dark</option>
+          <option value="bean">Bean</option>
         </select>
       </div>
       <hr></hr>
