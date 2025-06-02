@@ -43,7 +43,8 @@ export function createScene() {
 
   const texLoader = new THREE.TextureLoader();
 
-  const groundTexture = texLoader.load("/game/models/track/track.png");
+  const groundTexture = texLoader.load("/game/models/track1/track1Height.png");
+  groundTexture.colorSpace = THREE.LinearSRGBColorSpace; // Ensure color space is set correctly
 
   //load gltf model
   const gltfLoader = new GLTFLoader();
@@ -55,21 +56,20 @@ export function createScene() {
     new THREE.MeshBasicMaterial({ color: 0xffff00 })
   );
 
-  
   scene.add(marker);
 
   let omarker = new THREE.Mesh(
     new THREE.SphereGeometry(0.1, 16, 16),
     new THREE.MeshBasicMaterial({
-      color: 0xffff00
+      color: 0xffff00,
     })
   );
 
   scene.add(omarker);
 
-  gltfLoader.load("/game/models/track/track.glb", (gltf) => {
+  gltfLoader.load("/game/models/track1/track1.glb", (gltf) => {
     let track = gltf.scene;
-    track.scale.set(4, 2, 4); // Scale the model down
+    track.scale.set(40, 40, 40); // Scale the model down
 
     // Enable shadow casting for all meshes in the loaded GLTF model
     track.traverse((child) => {
@@ -106,45 +106,52 @@ export function createScene() {
 
       playerController.position.y += 0.5;
 
-      let origin =
-        1.1 -
-        getGroundHeight(
-          groundTexture,
-          (playerController.position.x / 29) * 0.5 + 0.5,
-          (playerController.position.z / 29) * 0.25 + 0.5
-        ).r /
-          100.0;
-
       let forwardVector = new THREE.Vector3(
         -Math.cos(playerController.rotation.y),
         0,
         Math.sin(playerController.rotation.y)
       ).add(playerController.position);
 
-      
       marker.position.copy(forwardVector);
       omarker.position.copy(playerController.position);
 
-      let forward =
-        1.1 -
+      const scl = 40;
+
+      let origin =
         getGroundHeight(
           groundTexture,
-          (forwardVector.x / 29) * 0.5 + 0.5,
-          (forwardVector.z / 29) * 0.25 + 0.5
+          -(playerController.position.z / scl) * 0.25 + 0.5,
+          (playerController.position.x / scl) * 0.5 + 0.5
         ).r /
-          100.0;
+          40;
 
-      playerController.position.y = origin;
-      playerController.rotation.z = Math.min(
-        (origin - forward),
-        Math.PI / 3
+      console.log(
+        getGroundHeight(
+          groundTexture,
+          -(playerController.position.z / scl) * 0.25 + 0.5,
+          (playerController.position.x / scl) * 0.5 + 0.5
+        ).r
+      );
+
+      let forward =
+        getGroundHeight(
+          groundTexture,
+          -(forwardVector.z / scl) * 0.25 + 0.5,
+          (forwardVector.x / scl) * 0.5 + 0.5
+        ).r /
+          40.0;
+
+      playerController.position.y = Math.pow(origin, 0.91) - 0;
+      playerController.rotation.z = Math.max(
+        Math.min(origin - forward, Math.PI / 3),
+        -Math.PI / 3
       );
 
       let translationalSpeed = new THREE.Vector2(
         playerController.velocity.x,
         playerController.velocity.z
       ).length();
-      camera.camera.fov = translationalSpeed + 80; // Adjust FOV based on speed
+      camera.camera.fov = Math.min(180, translationalSpeed / 4 + camera.fov); // Adjust FOV based on speed
       if (keys["a"]) {
         if (keys["s"]) {
           playerController.rotation.y -= 0.003 * translationalSpeed; // Rotate right

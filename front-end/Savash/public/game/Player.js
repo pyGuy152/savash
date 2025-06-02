@@ -5,8 +5,8 @@ import { keys } from "./input.js";
 export class PlayerController {
   constructor() {
 
-    this.position = new THREE.Vector3(0, 0, 0);
-    this.rotation = new THREE.Euler(0, 0, 0);
+    this.position = new THREE.Vector3(25, 0, 10);
+    this.rotation = new THREE.Euler(0, -Math.PI/2, 0);
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.acceleration = new THREE.Vector3(0, 0, 0);
     this.speed = 100;
@@ -30,7 +30,6 @@ export class PlayerController {
 
     this.acceleration.set(x, 0, y);
     this.acceleration.applyEuler(this.rotation, "XYZ"); // Apply rotation to acceleration
-    console.log(this.acceleration);
 
     this.position.addScaledVector(this.velocity, deltaTime);
 

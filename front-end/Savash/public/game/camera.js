@@ -27,8 +27,8 @@ export class CameraManager {
     const aspect =
       window.ui.gameWindow.clientWidth / window.ui.gameWindow.clientHeight;
 
-    this.camera = new THREE.PerspectiveCamera(90, aspect);
-    this.camera.layers.enable(1);
+    this.camera = new THREE.PerspectiveCamera(0, aspect);
+    this.fov = 160;
 
     this.cameraOrigin = new THREE.Vector3(0, 0, 0);
     this.cameraRadius = 50;
@@ -60,16 +60,18 @@ export class CameraManager {
   updateCameraPosition() {
     this.camera.zoom = this.cameraRadius;
     this.camera.position.x =
-      100 *
+      20 *
       Math.sin(this.cameraAzimuth * DEG2RAD) *
       Math.cos(this.cameraElevation * DEG2RAD);
-    this.camera.position.y = 100 * Math.sin(this.cameraElevation * DEG2RAD);
+    this.camera.position.y = 80 * Math.sin(this.cameraElevation * DEG2RAD);
     this.camera.position.z =
-      100 *
+      20 *
       Math.cos(this.cameraAzimuth * DEG2RAD) *
       Math.cos(this.cameraElevation * DEG2RAD);
     this.camera.position.add(this.cameraOrigin);
-    this.camera.lookAt(this.cameraOrigin);
+    let look = new THREE.Vector3(0).copy(this.cameraOrigin);
+    look.y += 0.3;
+    this.camera.lookAt(look);
     this.camera.updateProjectionMatrix();
     this.camera.updateMatrixWorld();
   }
@@ -134,13 +136,14 @@ export class CameraManager {
     //   }
     // }
     event.preventDefault();
-    this.cameraRadius *= 1 - event.deltaY * ZOOM_SENSITIVITY;
-    this.cameraRadius = Math.min(
-      MAX_CAMERA_RADIUS,
-      Math.max(MIN_CAMERA_RADIUS, this.cameraRadius)
-    );
-    this.updateCameraPosition();
-  }
+    // this.cameraRadius *= 1 - event.deltaY * ZOOM_SENSITIVITY;
+    // this.cameraRadius = Math.min(
+    //   MAX_CAMERA_RADIUS,
+    //   Math.max(MIN_CAMERA_RADIUS, this.cameraRadius)
+    // );
+    // this.updateCameraPosition();
+    this.camera.fov += event.deltaY * ZOOM_SENSITIVITY*2;
+      }
 
   resize() {
     const aspect =
