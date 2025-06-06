@@ -3,3 +3,23 @@
     width: 100vw;
     height: 100vh;
 }
+
+#loading{
+    text-align: center;
+}
+
+#start{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    backdrop-filter: blur(50px) brightness(0.8);
+}
+
+.start button{
+    padding: 15px 40px;
+    font-size: 2rem;
+}

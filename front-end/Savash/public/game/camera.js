@@ -28,12 +28,12 @@ export class CameraManager {
       window.ui.gameWindow.clientWidth / window.ui.gameWindow.clientHeight;
 
     this.camera = new THREE.PerspectiveCamera(0, aspect);
-    this.fov = 160;
+    this.fov = 170
 
     this.cameraOrigin = new THREE.Vector3(0, 0, 0);
-    this.cameraRadius = 50;
-    this.cameraAzimuth = 225;
-    this.cameraElevation = 10;
+    this.cameraRadius = 100;
+    this.cameraAzimuth = 0;
+    this.cameraElevation = 2;
 
     this.updateCameraPosition();
 
@@ -70,7 +70,7 @@ export class CameraManager {
       Math.cos(this.cameraElevation * DEG2RAD);
     this.camera.position.add(this.cameraOrigin);
     let look = new THREE.Vector3(0).copy(this.cameraOrigin);
-    look.y += 0.3;
+    look.y += 1;
     this.camera.lookAt(look);
     this.camera.updateProjectionMatrix();
     this.camera.updateMatrixWorld();
@@ -89,14 +89,14 @@ export class CameraManager {
       return; // Don't move camera until pointer is locked
     }
     // Handles the rotation of the camera
-    if (!event.ctrlKey && document.pointerLockElement === elem) {
-      this.cameraAzimuth += -(event.movementX * AZIMUTH_SENSITIVITY);
-      this.cameraElevation += event.movementY * ELEVATION_SENSITIVITY;
-      this.cameraElevation = Math.min(
-        MAX_CAMERA_ELEVATION,
-        Math.max(MIN_CAMERA_ELEVATION, this.cameraElevation)
-      );
-    }
+    // if (!event.ctrlKey && document.pointerLockElement === elem) {
+    //   this.cameraAzimuth += -(event.movementX * AZIMUTH_SENSITIVITY);
+    //   this.cameraElevation += event.movementY * ELEVATION_SENSITIVITY;
+    //   this.cameraElevation = Math.min(
+    //     MAX_CAMERA_ELEVATION,
+    //     Math.max(MIN_CAMERA_ELEVATION, this.cameraElevation)
+    //   );
+    // }
 
     // Handles the panning of the camera
     if (event.buttons & RIGHT_MOUSE_BUTTON && event.ctrlKey) {

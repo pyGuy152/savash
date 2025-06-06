@@ -20,9 +20,20 @@ function Game() {
 
   }, []);
 
+
+
   return (
     <>
       <div id="root-window">
+        <div id="loading">LOADING...</div>
+        <div id="start">
+          <button id="host">
+            Host
+          </button>
+          <button id="join">
+            Join
+          </button>
+        </div>
         <div id="render-target"></div>
       </div>
     </>

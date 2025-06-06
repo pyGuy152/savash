@@ -2,6 +2,8 @@ console.log("Game JS Loaded");
 
 import * as THREE from "three";
 
+import { apiUrl } from "../../src/types.js";
+
 import { CameraManager } from "./camera.js";
 
 import { PlayerController } from "./Player.js";
@@ -9,12 +11,18 @@ import { PlayerController } from "./Player.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { keys } from "./input.js";
 
+const hostBtn = document.getElementById("host");
+const joinBtn = document.getElementById("join");
+
 export function createScene() {
   const gameWindow = document.getElementById("render-target");
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x777777);
+  scene.background = new THREE.Color(0x112277);
+
+  const lightLayer = 10;
 
   const camera = new CameraManager();
+  camera.camera.layers.enable(lightLayer); // Enable layer 10 for the camera
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(gameWindow.clientWidth, gameWindow.clientHeight);
@@ -22,29 +30,28 @@ export function createScene() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Use soft shadows
   gameWindow.appendChild(renderer.domElement);
 
-  const dirLight = new THREE.DirectionalLight(0xffffee, 2);
-  dirLight.position.set(3, 5, 2);
+
+  const dirLight = new THREE.DirectionalLight(0xffeebb, 5);
+  dirLight.rotation.set(-Math.PI / 2, -Math.PI/5, 0); // Set the light direction
   dirLight.castShadow = true; // Enable shadow casting for the light
   dirLight.shadow.mapSize.width = 1024 * 2; // Set shadow map size
   dirLight.shadow.mapSize.height = 1024 * 2; // Set shadow map size
   dirLight.shadow.camera.near = 0.5; // Near plane for shadow camera
   dirLight.shadow.camera.far = 100; // Far plane for shadow camera
-  dirLight.shadow.camera.left = -10; // Left plane for shadow camera
-  dirLight.shadow.camera.right = 10; // Right plane for shadow camera
-  dirLight.shadow.camera.top = 10; // Top plane for shadow camera
-  dirLight.shadow.camera.bottom = -10; // Bottom plane for shadow camera
+  dirLight.shadow.camera.left = -80; // Left plane for shadow camera
+  dirLight.shadow.camera.right = 80; // Right plane for shadow camera
+  dirLight.shadow.camera.top = 50; // Top plane for shadow camera
+  dirLight.shadow.camera.bottom = -50; // Bottom plane for shadow camera
+  dirLight.layers.set(lightLayer); // Enable layer 0 for the light
+  dirLight.layers.disable(0);
   scene.add(dirLight);
 
-  const ambientLight = new THREE.AmbientLight(0x4040f0, 0.8); // Soft white light
+  const ambientLight = new THREE.AmbientLight(0x0000f0, 1); // Soft white light
   scene.add(ambientLight);
 
-  const lightHelper = new THREE.DirectionalLightHelper(dirLight, 0.5);
+  const lightHelper = new THREE.DirectionalLightHelper(dirLight, 5);
   scene.add(lightHelper);
 
-  const texLoader = new THREE.TextureLoader();
-
-  const groundTexture = texLoader.load("/game/models/track1/track1Height.png");
-  groundTexture.colorSpace = THREE.LinearSRGBColorSpace; // Ensure color space is set correctly
 
   //load gltf model
   const gltfLoader = new GLTFLoader();
@@ -67,14 +74,16 @@ export function createScene() {
 
   scene.add(omarker);
 
-  gltfLoader.load("/game/models/track1/track1.glb", (gltf) => {
+  gltfLoader.load("/game/models/trackbig/trackbig.glb", (gltf) => {
     let track = gltf.scene;
-    track.scale.set(40, 40, 40); // Scale the model down
+    track.scale.set(200, 200, 200); // Scale the model down
 
     // Enable shadow casting for all meshes in the loaded GLTF model
     track.traverse((child) => {
       if (child.isMesh) {
-        child.receiveShadow = true; // Only cast shadow, don't receive
+        child.receiveShadow = false; // Only cast shadow, don't receive
+        child.castShadow = false; // Enable shadow casting
+        child.layers.set(0); // Enable layer 0 for the track model
       }
     });
 
@@ -83,7 +92,8 @@ export function createScene() {
 
   gltfLoader.load("/game/models/car/car.glb", (gltf) => {
     playerController.player = gltf.scene;
-    playerController.player.scale.set(0.01, 0.01, 0.01); // Scale the model down
+    playerController.player.scale.set(0.5, 0.5, 0.5); // Scale the model down
+    playerController.player.layers.set(lightLayer); // Enable layer 0 for the player model
 
     // Enable shadow casting for all meshes in the loaded GLTF model
     playerController.player.traverse((child) => {
@@ -95,82 +105,82 @@ export function createScene() {
 
     scene.add(playerController.player);
 
-    activateTicking();
+    waitForStart();
   });
+
+  async function waitForStart() {
+    tick();
+    document.getElementById("loading").style.display = "none";
+    hostBtn.addEventListener("click", async () => {
+      document.getElementById("start").style.display = "none";
+
+      let name = prompt("Enter your name:");
+
+      console.log(
+        JSON.stringify({
+          host_name: name,
+          min: 0
+        })
+      );
+
+      let gameCode = await fetch(apiUrl + "/games/", {
+        method: "POST",
+        body: JSON.stringify({
+          host_name: name,
+          min: 0
+        }),
+      });
+
+      gameCode = await gameCode.text();
+
+      console.log("Game Code:", gameCode);
+
+      gameCode = Number(gameCode);
+      activateTicking();
+    });
+  }
 
   function activateTicking() {
     let ticking = setInterval(() => {
-      playerController.tick(0.016); // Assuming 60 FPS, so deltaTime is ~0.016 seconds
+      tick();
+    }, 16);
+  }
+
+  function tick() {
+    playerController.tick(0.016); // Assuming 60 FPS, so deltaTime is ~0.016 seconds
+
       camera.cameraOrigin.copy(playerController.position);
       camera.updateCameraPosition();
-
-      playerController.position.y += 0.5;
-
-      let forwardVector = new THREE.Vector3(
-        -Math.cos(playerController.rotation.y),
-        0,
-        Math.sin(playerController.rotation.y)
-      ).add(playerController.position);
-
-      marker.position.copy(forwardVector);
-      omarker.position.copy(playerController.position);
-
-      const scl = 40;
-
-      let origin =
-        getGroundHeight(
-          groundTexture,
-          -(playerController.position.z / scl) * 0.25 + 0.5,
-          (playerController.position.x / scl) * 0.5 + 0.5
-        ).r /
-          40;
-
-      console.log(
-        getGroundHeight(
-          groundTexture,
-          -(playerController.position.z / scl) * 0.25 + 0.5,
-          (playerController.position.x / scl) * 0.5 + 0.5
-        ).r
-      );
-
-      let forward =
-        getGroundHeight(
-          groundTexture,
-          -(forwardVector.z / scl) * 0.25 + 0.5,
-          (forwardVector.x / scl) * 0.5 + 0.5
-        ).r /
-          40.0;
-
-      playerController.position.y = Math.pow(origin, 0.91) - 0;
-      playerController.rotation.z = Math.max(
-        Math.min(origin - forward, Math.PI / 3),
-        -Math.PI / 3
-      );
+     
 
       let translationalSpeed = new THREE.Vector2(
         playerController.velocity.x,
         playerController.velocity.z
       ).length();
-      camera.camera.fov = Math.min(180, translationalSpeed / 4 + camera.fov); // Adjust FOV based on speed
+
+      camera.camera.fov = Math.min(180, translationalSpeed / 10 + camera.fov); // Adjust FOV based on speed
+      camera.cameraAzimuth = playerController.rotation.y*180 / Math.PI + 90; // Update camera azimuth based on player rotation
+      camera.updateCameraPosition();
+
+      playerController.accelerationRot.y = 0;
+
       if (keys["a"]) {
         if (keys["s"]) {
-          playerController.rotation.y -= 0.003 * translationalSpeed; // Rotate right
+          playerController.accelerationRot.y = -translationalSpeed; // Rotate right
         } else {
-          playerController.rotation.y += 0.003 * translationalSpeed; // Rotate right
+          playerController.accelerationRot.y = translationalSpeed; // Rotate right
         }
       }
       if (keys["d"]) {
         if (keys["s"]) {
-          playerController.rotation.y += 0.003 * translationalSpeed; // Rotate right
+          playerController.accelerationRot.y = translationalSpeed; // Rotate right
         } else {
-          playerController.rotation.y -= 0.003 * translationalSpeed; // Rotate right
+          playerController.accelerationRot.y = -translationalSpeed; // Rotate right
         }
       }
+
       dirLight.position.copy(playerController.position);
-      dirLight.position.add(new THREE.Vector3(3, 5, 2));
-      dirLight.target.position.copy(playerController.position);
-      scene.add(dirLight.target);
-    }, 16);
+      dirLight.position.y += 2; // Keep the light above the player
   }
 
   function draw() {

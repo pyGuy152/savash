@@ -26,7 +26,7 @@ function HomeNav() {
             <Link to="/contact">Contact</Link>
           </li>
           <li>
-            <Link to="/game">Game?</Link>
+            <Link to="/game">Game</Link>
           </li>
         </ul>
         <ul className="right">
