@@ -1,12 +1,12 @@
 import http
 from typing import List
 from fastapi import APIRouter, WebSocketDisconnect, status, HTTPException, Depends, WebSocket
-import random, time
+import random, time, json
 from pydantic import BaseModel
 from .. import oauth2
 from ..schemas import games_schemas
 from ..utils import sqlQuery
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 router = APIRouter(prefix='/games',tags=['Games'])
 
@@ -21,12 +21,21 @@ def make_game(data:games_schemas.MakeGame):
                 break
         except:
             break
-    games[f"{code}"] = {"people":[{'name':f"{data.host_name}","pos":[0,0,0]}],"time_end":datetime.now()+timedelta(minutes=data.min)}
-    return games
+    if data.min:
+        games[f"{code}"] = {"people":[{'name':f"{data.host_name}","pos":[0,0,0],"points":0}],"time_end":datetime.now()+timedelta(minutes=data.min)}
+    else:
+        games[f"{code}"] = {"people":[{'name':f"{data.host_name}","pos":[0,0,0],"points":0}],"time_end":None}
+    return {"code":f"{code}","game":games[f"{code}"]}
 
 class PlayerDataIn(BaseModel):
     name : str
     pos : List[int]
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
 
 class ConnectionManager:
     def __init__(self):
@@ -69,21 +78,18 @@ async def game(websocket: WebSocket, name: str):
                 for i in games[str(code)]["people"]:
                     if i['name'] == name:
                         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"{name} is in game")
-                games[str(code)]["people"].append({'name':f"{name}","pos":[0,0,0]})
+                games[str(code)]["people"].append({'name':f"{name}","pos":[0,0,0],"points":0})
                 await manager.send_message("Joined game",websocket)
                 break
             else:
                 await manager.send_message("code not found, try again",websocket)
         while True:
-            try:
-                json = await manager.get_json(websocket)
-                json = PlayerDataIn(**json)
-                for i in range(len(games[str(code)]["people"])):
-                    if games[str(code)]["people"][i]["name"] == json.name:
-                        games[str(code)]["people"][i]["pos"] = json.pos
-            except:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Make sure you are sending json in this format {"name":name,"pos":[0,0,0]}')
-            await manager.broadcast_json(games[str(code)])
+            jsonn = await manager.get_json(websocket)
+            for i in range(len(games[str(code)]["people"])):
+                if games[str(code)]["people"][i]["name"] == jsonn['name']:
+                    games[str(code)]["people"][i]["pos"] = jsonn['pos']
+                    games[str(code)]["people"][i]["points"] = jsonn['points']
+            await manager.broadcast_json(json.dumps(games[str(code)], cls=DateTimeEncoder))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(f"{name} left")
