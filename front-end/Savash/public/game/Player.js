@@ -12,8 +12,8 @@ export class PlayerController {
     this.accelerationRot = new THREE.Vector3(0, 0, 0);
     this.rotationSpeed = 0.05; // Rotation speed in radians per second
     this.rotationVelocity = new THREE.Vector3(0, 0, 0);
-    this.speed = 150;
-    this.maxSpeed = 100.0;
+    this.speed = 300;
+    this.maxSpeed = 200.0;
     this.player = null;
   }
   tick(deltaTime) {
@@ -48,6 +48,5 @@ export class PlayerController {
     this.player.position.copy(this.position);
 
     this.player.rotation.copy(this.rotation);
-    this.player.rotation.y -= Math.PI / 2; // Adjust rotation to face forward
   }
 }

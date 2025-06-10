@@ -3,6 +3,19 @@ import "./Game.css";
 
 function Game() {
   useEffect(() => {
+
+    const module = document.createElement("script");
+    module.type="importmap"
+    module.innerHTML = `
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+          "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/loaders/GLTFLoader.min.js"
+        }
+      }
+      `;
+    document.body.appendChild(module);
+
     const gameScript = document.createElement("script");
     gameScript.type = "module";
     gameScript.src = "/game/Game.js";

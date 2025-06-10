@@ -31,9 +31,9 @@ export class CameraManager {
     this.fov = 170
 
     this.cameraOrigin = new THREE.Vector3(0, 0, 0);
-    this.cameraRadius = 100;
+    this.cameraRadius = 100; //100
     this.cameraAzimuth = 0;
-    this.cameraElevation = 2;
+    this.cameraElevation = 2; //2
 
     this.updateCameraPosition();
 
