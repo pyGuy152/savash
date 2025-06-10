@@ -1,8 +1,9 @@
 from typing import Optional
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from .routes import auth, users, classes, assignments, posts, games, submit, run
+from .routes import auth, users, classes, assignments, posts, games, submit, run, graphQL
+from .oauth2 import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
@@ -28,6 +29,8 @@ app.include_router(submit.router)
 app.include_router(posts.router)
 app.include_router(run.router)
 app.include_router(games.router)
+#dependencies=[Depends(get_current_user)]
+app.include_router(graphQL.router)
 
 @app.get('/')
 def root():

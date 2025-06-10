@@ -5,4 +5,4 @@ from datetime import datetime
 
 class MakeGame(BaseModel):
     host_name: str
-    min: int
+    min: Optional[int] = None
