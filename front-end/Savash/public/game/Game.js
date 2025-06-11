@@ -2,7 +2,7 @@ console.log("Game JS Loaded");
 
 import * as THREE from "three";
 
-import { apiUrl } from "../../src/types.js";
+let apiUrl = "https://api.codewasabi.xyz";
 
 import { CameraManager } from "./camera.js";
 
