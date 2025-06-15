@@ -10,6 +10,7 @@ app = FastAPI()
 origins = [
     'https://savash.rohanjain.xyz',
     'https://builds.rohanjain.xyz',
+    'https://savashkart.rohanjain.xyz',
     'http://localhost:5173',
 ]
 

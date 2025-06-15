@@ -1,7 +1,7 @@
-import http
-from typing import List, Optional
+from typing import List, Optional, Dict
 from fastapi import APIRouter, WebSocketDisconnect, status, HTTPException, Depends, WebSocket
 import random, time, json
+from fastapi.websockets import WebSocketState
 from pydantic import BaseModel
 from .. import oauth2
 from ..schemas import games_schemas
@@ -9,23 +9,6 @@ from ..utils import sqlQuery
 from datetime import datetime, timedelta, date
 
 router = APIRouter(prefix='/games',tags=['Games'])
-
-games = {}
-
-@router.post("/")
-def make_game(data:games_schemas.MakeGame):
-    while True:
-        code = random.randint(111111,999999)
-        try:
-            if not games[code]:
-                break
-        except:
-            break
-    if data.min:
-        games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(minutes=data.min)}
-    else:
-        games[f"{code}"] = {"people":[],"time_end":None}
-    return {"code":f"{code}","game":games[f"{code}"]}
 
 class PlayerDataIn(BaseModel):
     name : str
@@ -39,63 +22,113 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: Dict[str, List[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self,code :str , websocket: WebSocket):
         await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        if f"{code}" not in self.active_connections:
+            self.active_connections[f"{code}"] = []
+        self.active_connections[f"{code}"].append(websocket)
+    
+    def disconnect(self,code : str ,websocket: WebSocket):
+        if f"{code}" in self.active_connections:
+            self.active_connections[f"{code}"].remove(websocket)
 
     async def get_message(self, websocket: WebSocket):
-        return await websocket.receive_text()
+        if websocket.application_state == WebSocketState.CONNECTED:
+            return await websocket.receive_text()
 
     async def get_json(self, websocket: WebSocket):
-        return await websocket.receive_json()
+        if websocket.application_state == WebSocketState.CONNECTED:
+            return await websocket.receive_json()
 
     async def send_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+        if websocket.application_state == WebSocketState.CONNECTED:
+            await websocket.send_text(message)
 
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+    async def broadcast(self, code: str, message: str):
+        for connection in self.active_connections[f"{code}"]:
+            if connection.application_state == WebSocketState.CONNECTED:
+                await connection.send_text(message)
     
-    async def broadcast_json(self, json):
-        for connection in self.active_connections:
-            await connection.send_json(json)
+    async def broadcast_json(self, code: str, json ):
+        for connection in self.active_connections[f"{code}"]:
+            if connection.application_state == WebSocketState.CONNECTED:
+                await connection.send_json(json)
     
-    async def close_connection(self, websocket: WebSocket, reason : Optional[str] = None):
-        if reason:
-            await websocket.close(reason=reason)
+    async def close_connection(self, code: str, websocket: WebSocket, reason: Optional[str] = None):
+        if websocket.application_state == WebSocketState.CONNECTED:
+            try:
+                if reason:
+                    await websocket.close(code=status.WS_1001_GOING_AWAY, reason=reason)
+                else:
+                    await websocket.close(code=status.WS_1000_NORMAL_CLOSURE)
+            except RuntimeError as e:
+                print(f"Error closing WebSocket {websocket}: {e}")
+            finally:
+                self.disconnect(code, websocket)
         else:
-            await websocket.close(reason=reason)
+            self.disconnect(code, websocket)
+            print(f"Attempted to close already disconnected WebSocket: {websocket}")
+
+games = {}
+leaderboard = {}
+
+@router.post("/")
+def make_game(data:games_schemas.MakeGame):
+    while True:
+        code = random.randint(111111,999999)
+        try:
+            if not games[code]:
+                break
+        except:
+            break
+    games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min)}
+    leaderboard[str(code)] = []
+    return {"code":f"{code}","game":games[f"{code}"]}
+
+@router.get("/{code}/leaderboard")
+def get_leaderboard(code: str):
+    if code in leaderboard:
+        return leaderboard[code]
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Game with code {code} not found")
 
 manager = ConnectionManager()
 
 @router.websocket("/{code}/{name}")
 async def game(websocket: WebSocket,code: str, name: str):
-    await manager.connect(websocket)
+    await manager.connect(code, websocket)
     try:
-        try:
-            for i in games[str(code)]["people"]:
-                if i['name'] == name:
-                    await manager.close_connection(websocket,reason=f"{name} is in game")
-            games[str(code)]["people"].append({'name':f"{name}","pos":{"x":0,"y":0,"z":0},"rot":{"x":0,"y":0,"z":0},"points":0})
-            await manager.send_message("Joined game",websocket)
-        except:
-            await manager.close_connection(websocket,reason="code not found")
+        if str(code) not in games:
+            await manager.close_connection(code,websocket,reason="code not found")
+            return
+        for i in games[str(code)]["people"]:
+            if i['name'] == name:
+                await manager.close_connection(code,websocket,reason=f"{name} is in game")
+                return
+        games[str(code)]["people"].append({'name':f"{name}","pos":{"x":0,"y":0,"z":0},"rot":{"x":0,"y":0,"z":0},"vel":{"x":0,"y":0,"z":0},"points":0})
+        leaderboard[str(code)].append({str(name):0})
+        await manager.send_message("Joined game",websocket)
         while True:
+            if datetime.now() > games[str(code)]["time_end"]:
+                del games[str(code)]
+                await manager.close_connection(code,websocket,reason=f"Game over")
+                return
             jsonn = await manager.get_json(websocket)
-            for i in range(len(games[str(code)]["people"])):
-                if games[str(code)]["people"][i]["name"] == name:
-                    games[str(code)]["people"][i]["pos"] = jsonn['pos']
-                    games[str(code)]["people"][i]["rot"] = jsonn['rot']
-            await manager.broadcast_json(json.dumps(games[str(code)], cls=DateTimeEncoder))
+            if jsonn:
+                for i in range(len(games[str(code)]["people"])):
+                    if games[str(code)]["people"][i]["name"] == name:
+                        games[str(code)]["people"][i]["pos"] = jsonn['pos']
+                        games[str(code)]["people"][i]["rot"] = jsonn['rot']
+                        games[str(code)]["people"][i]["vel"] = jsonn['vel']
+            await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"{name} left")
+        manager.disconnect(code, websocket)
+        await manager.broadcast(code, f"{name} left")
         for i in games[str(code)]["people"]:
             if i["name"] == name:
                 games[str(code)]["people"].remove(i)
                 break
+        if datetime.now() > games[str(code)]["time_end"]:
+            del games[str(code)]
+        
