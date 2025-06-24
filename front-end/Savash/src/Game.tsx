@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+
 import "./Game.css";
 import HomeNav from "./components/HomeNav";
 
