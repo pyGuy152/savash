@@ -23,3 +23,22 @@
     padding: 15px 40px;
     font-size: 2rem;
 }
+
+#savash-img{
+    background-image: url("/savash-img.png");
+    padding: 200px 100px 0px 10px;
+    background-size: 100% 100%;
+    margin: 20px;
+    border-radius: 1rem;
+    display: inline-block;
+}
+
+#savash-img h2{
+    color: var(--textColor);
+    font-size: 3rem;
+    line-height: 0.1em;
+}
+
+#savash-img:hover{
+    scale: 1.01;
+}
