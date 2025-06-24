@@ -4,6 +4,6 @@ from enum import Enum
 from datetime import datetime
 
 class MakeGame(BaseModel):
-    days: int
-    hours: int
-    min: int
+    days: Optional[int] = 0
+    hours: Optional[int] = 0
+    min: Optional[int] = 0
