@@ -83,6 +83,12 @@ def make_game(data:games_schemas.MakeGame):
                 break
         except:
             break
+    if not data.days:
+        data.days = 0
+    if not data.hours:
+        data.hours = 0
+    if not data.min:
+        data.min = 0
     games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min)}
     leaderboard[str(code)] = []
     return {"code":f"{code}","game":games[f"{code}"]}
@@ -131,4 +137,3 @@ async def game(websocket: WebSocket,code: str, name: str):
                 break
         if datetime.now() > games[str(code)]["time_end"]:
             del games[str(code)]
-        
