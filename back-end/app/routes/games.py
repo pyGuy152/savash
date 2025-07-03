@@ -107,10 +107,12 @@ async def game(websocket: WebSocket,code: str, name: str):
     try:
         if str(code) not in games:
             await manager.close_connection(code,websocket,reason="code not found")
+            print(f"WebSocket disconnected because code not found")
             return
         for i in games[str(code)]["people"]:
             if i['name'] == name:
                 await manager.close_connection(code,websocket,reason=f"{name} is in game")
+                print(f"WebSocket disconnected because {name} is in game")
                 return
         games[str(code)]["people"].append({'name':f"{name}","pos":{"x":0,"y":0,"z":0},"rot":{"x":0,"y":0,"z":0},"vel":{"x":0,"y":0,"z":0},"points":0})
         leaderboard[str(code)].append({str(name):0})
@@ -119,6 +121,7 @@ async def game(websocket: WebSocket,code: str, name: str):
             if datetime.now() > games[str(code)]["time_end"]:
                 del games[str(code)]
                 await manager.close_connection(code,websocket,reason=f"Game over")
+                print(f"WebSocket disconnected because Game over")
                 return
             jsonn = await manager.get_json(websocket)
             if jsonn:
@@ -128,7 +131,8 @@ async def game(websocket: WebSocket,code: str, name: str):
                         games[str(code)]["people"][i]["rot"] = jsonn['rot']
                         games[str(code)]["people"][i]["vel"] = jsonn['vel']
             await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
-    except WebSocketDisconnect:
+    except WebSocketDisconnect as e:
+        print(f"WebSocket disconnected: {e.code} - {e.reason}")
         manager.disconnect(code, websocket)
         await manager.broadcast(code, f"{name} left")
         for i in games[str(code)]["people"]:
