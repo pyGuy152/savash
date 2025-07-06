@@ -34,8 +34,9 @@ class TFQAssignment(AssignmentBase):
     questions: List[str]
     correct_answer: List[str]
 
+
 class CodingAssignment(AssignmentBase):
-    input: List[str]
+    input: List[List[str]]
     output: List[str]
 
 
@@ -46,6 +47,8 @@ class UpdateAssignment(BaseModel):
     questions: Optional[list] = None
     choices: Optional[list] = None
     correct_answer: Optional[list] = None
+    input: Optional[List[List[str]]] = None
+    output: Optional[List[str]] = None
     points: Optional[int] = None
     due_date: Optional[datetime] = None
 

@@ -91,3 +91,4 @@ def createContact(email: str, name: str):
     response.raise_for_status()
     output = response.json()
     return output
+
