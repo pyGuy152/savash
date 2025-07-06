@@ -40,3 +40,4 @@ def get_written_submissions(code: int, id: int, tokenData = Depends(oauth2.get_c
         x = getSubmissionFile(file_name=file_name["submission_path"]) # type: ignore
         if x:
             return StreamingResponse(x[0].iter_content(chunk_size=8192),media_type=x[1])
+        
