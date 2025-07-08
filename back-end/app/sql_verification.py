@@ -106,3 +106,22 @@ def checkPostOwner(user_id, post_id):
         return False
     else:
         return True
+
+def getAssignmentType(id):
+    written = sqlQuery("SELECT * FROM written WHERE assignment_id = %s;",(id,))
+    mcq = sqlQuery("SELECT * FROM mcq WHERE assignment_id = %s;",(id,))
+    frq = sqlQuery("SELECT * FROM frq WHERE assignment_id = %s;",(id,))
+    tfq = sqlQuery("SELECT * FROM tfq WHERE assignment_id = %s;",(id,))
+    coding = sqlQuery("SELECT * FROM coding WHERE assignment_id = %s;",(id,))
+    if written:
+        return "written"
+    elif mcq:
+        return "mcq"
+    elif frq:
+        return "frq"
+    elif tfq:
+        return "tfq"
+    elif coding:
+        return "coding"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assignment not found")

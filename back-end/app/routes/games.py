@@ -5,6 +5,7 @@ from fastapi.websockets import WebSocketState
 from pydantic import BaseModel
 from .. import oauth2
 from ..schemas import games_schemas
+from ..sql_verification import getAssignmentType
 from ..utils import sqlQuery
 from datetime import datetime, timedelta, date
 
@@ -89,7 +90,9 @@ def make_game(data:games_schemas.MakeGame):
         data.hours = 0
     if not data.min:
         data.min = 0
-    games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min)}
+    if data.assignment_id and getAssignmentType(data.assignment_id) != "mcq" and getAssignmentType(data.assignment_id) != "tfq":
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail='you can only choose multiple choice and true false question assignments')
+    games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min),"assignment_id":data.assignment_id}
     leaderboard[str(code)] = []
     return {"code":f"{code}","game":games[f"{code}"]}
 
@@ -124,6 +127,12 @@ async def game(websocket: WebSocket,code: str, name: str):
                 print(f"WebSocket disconnected because Game over")
                 return
             jsonn = await manager.get_json(websocket)
+            if jsonn['message'] == 'question':
+                if (getAssignmentType(games[str(code)])=="mcq"):
+                    questions = sqlQuery('SELECT questions, choices, correct_answer FROM mcq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],),fetchALL=True)
+                    print("")
+                else:
+                    questions = sqlQuery('SELECT questions, correct_answer FROM tfq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],),fetchALL=True)
             if jsonn:
                 for i in range(len(games[str(code)]["people"])):
                     if games[str(code)]["people"][i]["name"] == name:

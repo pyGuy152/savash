@@ -7,3 +7,4 @@ class MakeGame(BaseModel):
     days: Optional[int] = 0
     hours: Optional[int] = 0
     min: Optional[int] = 0
+    assignment_id: Optional[int] = None
