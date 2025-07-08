@@ -87,7 +87,7 @@ def check_user(email: str):
         return True
 
 def getUsername(id):
-    user = sqlQuery("SELECT * FROM users WHERE user_is = %s;",(id,))
+    user = sqlQuery("SELECT * FROM users WHERE user_id = %s;",(id,))
     if not user:
         return None
     else:

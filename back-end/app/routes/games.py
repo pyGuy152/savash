@@ -46,6 +46,10 @@ class ConnectionManager:
     async def send_message(self, message: str, websocket: WebSocket):
         if websocket.application_state == WebSocketState.CONNECTED:
             await websocket.send_text(message)
+    
+    async def send_json(self, json: dict, websocket: WebSocket):
+        if websocket.application_state == WebSocketState.CONNECTED:
+            await websocket.send_json(json)
 
     async def broadcast(self, code: str, message: str):
         for connection in self.active_connections[f"{code}"]:
@@ -127,19 +131,37 @@ async def game(websocket: WebSocket,code: str, name: str):
                 print(f"WebSocket disconnected because Game over")
                 return
             jsonn = await manager.get_json(websocket)
-            if jsonn['message'] == 'question':
-                if (getAssignmentType(games[str(code)])=="mcq"):
-                    questions = sqlQuery('SELECT questions, choices, correct_answer FROM mcq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],),fetchALL=True)
-                    print("")
-                else:
-                    questions = sqlQuery('SELECT questions, correct_answer FROM tfq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],),fetchALL=True)
             if jsonn:
-                for i in range(len(games[str(code)]["people"])):
-                    if games[str(code)]["people"][i]["name"] == name:
-                        games[str(code)]["people"][i]["pos"] = jsonn['pos']
-                        games[str(code)]["people"][i]["rot"] = jsonn['rot']
-                        games[str(code)]["people"][i]["vel"] = jsonn['vel']
-            await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
+                try:
+                    if jsonn['message'] == 'question':
+                        if (getAssignmentType(games[str(code)]['assignment_id'])=="mcq"):
+                            data = sqlQuery('SELECT questions, choices, correct_answer FROM mcq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
+                            index = random.randint(0,len(data['questions'])-1)
+                            await manager.send_json({'question':data['questions'][index],'choices':data['choices'][index]},websocket)
+                            answer_json = await manager.get_json(websocket)
+                            if answer_json:
+                                if answer_json["answer"] == data['correct_answer'][index]:
+                                    await manager.send_json({'message':'Correct'},websocket)
+                                else:
+                                    await manager.send_json({'message':'Incorrect'},websocket)
+                        else:
+                            data = sqlQuery('SELECT questions, correct_answer FROM tfq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
+                            index = random.randint(0,len(data['questions'])-1)
+                            await manager.send_json({'question':data['questions'][index],'choices':['t','f']},websocket)
+                            answer_json = await manager.get_json(websocket)
+                            if answer_json:
+                                if answer_json["answer"] == data['correct_answer'][index]:
+                                    await manager.send_json({'message':'Correct'},websocket)
+                                else:
+                                    await manager.send_json({'message':'Incorrect'},websocket)
+                except Exception as e:
+                    print(e)
+                    for i in range(len(games[str(code)]["people"])):
+                        if games[str(code)]["people"][i]["name"] == name:
+                            games[str(code)]["people"][i]["pos"] = jsonn['pos']
+                            games[str(code)]["people"][i]["rot"] = jsonn['rot']
+                            games[str(code)]["people"][i]["vel"] = jsonn['vel']
+                await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
     except WebSocketDisconnect as e:
         print(f"WebSocket disconnected: {e.code} - {e.reason}")
         manager.disconnect(code, websocket)

@@ -32,7 +32,7 @@ class FRQAssignment(AssignmentBase):
 
 class TFQAssignment(AssignmentBase):
     questions: List[str]
-    correct_answer: List[str]
+    correct_answer: List[bool]
 
 
 class CodingAssignment(AssignmentBase):
