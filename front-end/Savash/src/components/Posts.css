@@ -1,0 +1,29 @@
+
+.posts{
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.post {
+    background: linear-gradient(to bottom right, var(--navColor) 0%, var(--tint) 100%);
+    background-size: 200% 200%;
+    padding: 20px;
+    box-shadow: 10px 10px 20px #3333;
+    width: 300px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: background-size 0.5s;
+    cursor: pointer;
+
+    p{
+        font-size: 1rem;
+    }
+
+    &:hover{
+        background-size: 100% 100%;
+    }
+}
+

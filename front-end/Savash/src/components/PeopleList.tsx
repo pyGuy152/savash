@@ -81,11 +81,15 @@ function PeopleList({classID}: PeopleListProp) {
               {people.map((e, i) => (
                 <li key={i} className="person-row">
                   <p className="left">
-                    {e.role === "teacher" ? <span className="teacher">Teacher</span> : ""}
+                    {e.role === "teacher" ? (
+                      <span className="teacher">Teacher</span>
+                    ) : (
+                      ""
+                    )}
                     {e.name}
                     <span className="username">({e.username})</span>
                   </p>
-                  <div className="middle">
+                  <div className="middle" style={{display: localStorage.getItem("role") === "teacher" ? "" : "none"}}>
                     <p>{e.email}</p>
                     <button
                       onClick={() => openDialog(e.email)}

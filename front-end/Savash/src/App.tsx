@@ -30,19 +30,84 @@ function App() {
                   navigate("/dashboard");
                 }
               })
-              .catch(() => {
-                LOGOUT();
-              });
-          }
-      }, []);
-
+              .catch(() => {})}});
   return (
     <>
       <HomeNav />
-      <h1 className="welcome">Welcome to Savash</h1>
-      <h2 className="welcome">The note taking and assignment submission app</h2>
-      {Array.from({ length: 200 }).map((_, i) => (<br key={i} />))}
-      <button>Secret</button>
+
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          background:
+            "linear-gradient(135deg, var(--backgroundColor) 20%, var(--tint) 100%)",
+          padding: "0",
+          width: "100%",
+        }}
+      >
+        <h1 className="welcome">
+          Welcome to{" "}
+          <span
+            style={{
+              textDecoration: "underline overline",
+              textShadow: "5px 5px 10px #3333",
+              color: "var(--warningColor)",
+            }}
+          >
+            Savash
+          </span>
+        </h1>
+        <h2 className="welcome subtitle">
+          Your all-in-one classroom management and learning platform
+        </h2>
+        <div className="cta-btns">
+          <button className="cta-btn" onClick={() => navigate("/login")}>
+            Login
+          </button>
+          <button
+            className="cta-btn register"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </button>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div className="desc-section">
+          <p>
+            <b>Savash</b> is a modern classroom management tool designed to
+            simplify teaching and learning. Organize assignments, manage
+            classes, and foster collaboration—all in one place.
+          </p>
+        </div>
+        <div className="desc-section">
+          <ul className="features-list">
+            <li>
+              <b>Secure:</b> Your data is safe (we hash your
+              passwords)
+            </li>
+            <li>
+              <b>Resources:</b> Access class materials anytime.
+            </li>
+            <li>
+              <b>Personalized:</b> See your assignments,
+              class posts and classmates in your dashboard.
+            </li>
+            <li>
+              <b>Fun:</b> Have fun participating in the Savash
+              game!
+            </li>
+            <li>
+              <b>Easy:</b> Create, submit, and track
+              assignments with just a few clicks.
+            </li>
+          </ul>
+        </div>
+      </div>
     </>
   );
 }

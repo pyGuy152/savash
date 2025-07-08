@@ -10,7 +10,7 @@
   border-radius: 10px;
 }
 
-.Register label, .Register input {
+.Register label, .Register input, .Register textarea {
   margin-bottom: 5px;
   font-size: 2rem;
   color: var(--textColor);
@@ -21,7 +21,7 @@
   font-weight: 500;
 }
 
-.Register input {
+.Register input, .Register textarea {
   padding: 10px;
   border-radius: 5px;
   border: solid 3px #ccc;

@@ -10,3 +10,72 @@ br{
 body{
     overflow-x: hidden
 }
+
+    .welcome {
+      font-family: inherit;
+      color: var(--submitColor);
+      margin: 1.5em 0 0.2em 0;
+      letter-spacing: 1px;
+      font-size: 5em;
+      text-underline-offset: 15px;
+      text-align: center;
+    }
+    .subtitle {
+      color: var(--tabBackgroundColor);
+      font-size: 1.3em;
+      margin: 0.5em 0 3em 0;
+      font-size: 1.4em;
+      color: var(--textColor);
+      font-family: inherit;
+    }
+    .features-list {
+      margin: 1.5em 0 0 0;
+      padding: 0 0 0 1.2em;
+      font-size: 1.08em;
+      color: var(--textColor);
+      font-family: inherit;
+    }
+    .cta-btns {
+      display: flex;
+      gap: 1.5em;
+      margin-top: 2.5em;
+      justify-content: center;
+    }
+    .cta-btn {
+      background: --submitColor;
+      color: var(--textColor);
+      border: none;
+      border-radius: 2em;
+      padding: 0.8em 2.2em;
+      font-size: 1.1em;
+      font-weight: 600;
+      box-shadow: 0 2px 12px 0 var(--midColor);
+      transition: background 0.2s, transform 0.2s;
+      font-family: inherit;
+      min-width: 120px;
+    }
+    .cta-btn.register {
+      background: var(--submitColor);
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 18px 0 var(--tabBackgroundColor);
+    }
+    .desc-section {
+      max-width: 700px;
+      background: var(--navColor);
+      border-radius: 1.5em;
+      box-shadow: 0 2px 16px 0 var(--midColor);
+      padding: 20px 40px;
+      margin: 20px;
+    }
+
+    .features-list li{
+        margin: 20px 0px;
+    }
+
+    .features-list b{
+        margin-right: 10px;
+        font-size: 2em;
+        display: block;
+    }

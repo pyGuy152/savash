@@ -131,3 +131,11 @@ export function loadTheme(){
       document.body.setAttribute("style", str);
   }
 }
+
+export interface post {
+  post_id: number;
+  title: string;
+  content: string;
+  username: string;
+  posted_at: Date;
+}

@@ -87,7 +87,6 @@ function AddAssignment() {
           break;
       }
       
-      console.log(data);
       fetch(apiUrl + "/classes/" + code + "/assignments/" + type + "/", {
         body: JSON.stringify(data),
         method: "POST",

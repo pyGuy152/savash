@@ -73,3 +73,30 @@
     text-decoration: underline;
     text-underline-offset: 4px;
 }
+
+.post-create form{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.post-create{
+    max-width: 500px;
+    width: 50%;
+    border: none;
+    padding: 0;
+    border-radius: 30px;
+}
+
+.post-create button{
+    margin: 10px 0px;
+    font-size: 1.3rem;
+}
+
+.post-create .row{
+    margin: 20px 0px;
+}
+
+.post-create form{
+    margin: 0
+}
