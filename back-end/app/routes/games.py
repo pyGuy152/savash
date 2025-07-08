@@ -137,22 +137,22 @@ async def game(websocket: WebSocket,code: str, name: str):
                         if (getAssignmentType(games[str(code)]['assignment_id'])=="mcq"):
                             data = sqlQuery('SELECT questions, choices, correct_answer FROM mcq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
                             if data:
-                                index = random.randint(0,len(data['questions'])-1)
-                                await manager.send_json({'question':data['questions'][index],'choices':data['choices'][index]},websocket)
+                                index = random.randint(0,len(data['questions'])-1) # type: ignore
+                                await manager.send_json({'question':data['questions'][index],'choices':data['choices'][index]},websocket) # type: ignore
                                 answer_json = await manager.get_json(websocket)
                                 if answer_json:
-                                    if answer_json["answer"] == data['correct_answer'][index]:
+                                    if answer_json["answer"] == data['correct_answer'][index]: # type: ignore
                                         await manager.send_json({'message':'Correct'},websocket)
                                     else:
                                         await manager.send_json({'message':'Incorrect'},websocket)
                         else:
                             data = sqlQuery('SELECT questions, correct_answer FROM tfq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
                             if data:
-                                index = random.randint(0,len(data['questions'])-1)
-                                await manager.send_json({'question':data['questions'][index],'choices':['t','f']},websocket)
+                                index = random.randint(0,len(data['questions'])-1) # type: ignore
+                                await manager.send_json({'question':data['questions'][index],'choices':['t','f']},websocket) # type: ignore
                                 answer_json = await manager.get_json(websocket)
                                 if answer_json:
-                                    if answer_json["answer"] == data['correct_answer'][index]:
+                                    if answer_json["answer"] == data['correct_answer'][index]: # type: ignore
                                         await manager.send_json({'message':'Correct'},websocket)
                                     else:
                                         await manager.send_json({'message':'Incorrect'},websocket)
