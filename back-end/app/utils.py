@@ -14,7 +14,7 @@ email_api = os.getenv("EMAIL_API")
 
 
 
-def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
+def sqlQuery(sql: str, params: tuple, fetchALL: bool = False, fetchNone: bool = False):
     while True:
         try:
             conn = psycopg2.connect(database='savash',user=db_user,password=db_pass,host='localhost',port='5432',cursor_factory=RealDictCursor)
@@ -29,6 +29,8 @@ def sqlQuery(sql: str, params: tuple, fetchALL: bool = False):
     try:
         if fetchALL:
             out = cur.fetchall()
+        elif fetchNone:
+            out = None
         else:
             out = cur.fetchone()
     except Exception as e:
@@ -91,3 +93,4 @@ def createContact(email: str, name: str):
     response.raise_for_status()
     output = response.json()
     return output
+

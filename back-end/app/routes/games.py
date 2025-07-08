@@ -5,6 +5,7 @@ from fastapi.websockets import WebSocketState
 from pydantic import BaseModel
 from .. import oauth2
 from ..schemas import games_schemas
+from ..sql_verification import getAssignmentType
 from ..utils import sqlQuery
 from datetime import datetime, timedelta, date
 
@@ -45,6 +46,10 @@ class ConnectionManager:
     async def send_message(self, message: str, websocket: WebSocket):
         if websocket.application_state == WebSocketState.CONNECTED:
             await websocket.send_text(message)
+    
+    async def send_json(self, json: dict, websocket: WebSocket):
+        if websocket.application_state == WebSocketState.CONNECTED:
+            await websocket.send_json(json)
 
     async def broadcast(self, code: str, message: str):
         for connection in self.active_connections[f"{code}"]:
@@ -89,7 +94,9 @@ def make_game(data:games_schemas.MakeGame):
         data.hours = 0
     if not data.min:
         data.min = 0
-    games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min)}
+    if data.assignment_id and getAssignmentType(data.assignment_id) != "mcq" and getAssignmentType(data.assignment_id) != "tfq":
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail='you can only choose multiple choice and true false question assignments')
+    games[f"{code}"] = {"people":[],"time_end":datetime.now()+timedelta(days=data.days,hours=data.hours,minutes=data.min),"assignment_id":data.assignment_id}
     leaderboard[str(code)] = []
     return {"code":f"{code}","game":games[f"{code}"]}
 
@@ -107,10 +114,12 @@ async def game(websocket: WebSocket,code: str, name: str):
     try:
         if str(code) not in games:
             await manager.close_connection(code,websocket,reason="code not found")
+            print(f"WebSocket disconnected because code not found")
             return
         for i in games[str(code)]["people"]:
             if i['name'] == name:
                 await manager.close_connection(code,websocket,reason=f"{name} is in game")
+                print(f"WebSocket disconnected because {name} is in game")
                 return
         games[str(code)]["people"].append({'name':f"{name}","pos":{"x":0,"y":0,"z":0},"rot":{"x":0,"y":0,"z":0},"vel":{"x":0,"y":0,"z":0},"points":0})
         leaderboard[str(code)].append({str(name):0})
@@ -119,16 +128,43 @@ async def game(websocket: WebSocket,code: str, name: str):
             if datetime.now() > games[str(code)]["time_end"]:
                 del games[str(code)]
                 await manager.close_connection(code,websocket,reason=f"Game over")
+                print(f"WebSocket disconnected because Game over")
                 return
             jsonn = await manager.get_json(websocket)
             if jsonn:
-                for i in range(len(games[str(code)]["people"])):
-                    if games[str(code)]["people"][i]["name"] == name:
-                        games[str(code)]["people"][i]["pos"] = jsonn['pos']
-                        games[str(code)]["people"][i]["rot"] = jsonn['rot']
-                        games[str(code)]["people"][i]["vel"] = jsonn['vel']
-            await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
-    except WebSocketDisconnect:
+                try:
+                    if jsonn['message'] == 'question':
+                        if (getAssignmentType(games[str(code)]['assignment_id'])=="mcq"):
+                            data = sqlQuery('SELECT questions, choices, correct_answer FROM mcq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
+                            if data:
+                                index = random.randint(0,len(data['questions'])-1)
+                                await manager.send_json({'question':data['questions'][index],'choices':data['choices'][index]},websocket)
+                                answer_json = await manager.get_json(websocket)
+                                if answer_json:
+                                    if answer_json["answer"] == data['correct_answer'][index]:
+                                        await manager.send_json({'message':'Correct'},websocket)
+                                    else:
+                                        await manager.send_json({'message':'Incorrect'},websocket)
+                        else:
+                            data = sqlQuery('SELECT questions, correct_answer FROM tfq WHERE assignment_id = %s;',(games[str(code)]['assignment_id'],))
+                            if data:
+                                index = random.randint(0,len(data['questions'])-1)
+                                await manager.send_json({'question':data['questions'][index],'choices':['t','f']},websocket)
+                                answer_json = await manager.get_json(websocket)
+                                if answer_json:
+                                    if answer_json["answer"] == data['correct_answer'][index]:
+                                        await manager.send_json({'message':'Correct'},websocket)
+                                    else:
+                                        await manager.send_json({'message':'Incorrect'},websocket)
+                except Exception as e:
+                    for i in range(len(games[str(code)]["people"])):
+                        if games[str(code)]["people"][i]["name"] == name:
+                            games[str(code)]["people"][i]["pos"] = jsonn['pos']
+                            games[str(code)]["people"][i]["rot"] = jsonn['rot']
+                            games[str(code)]["people"][i]["vel"] = jsonn['vel']
+                    await manager.broadcast_json(code,json.dumps(games[str(code)], cls=DateTimeEncoder))
+    except WebSocketDisconnect as e:
+        print(f"WebSocket disconnected: {e.code} - {e.reason}")
         manager.disconnect(code, websocket)
         await manager.broadcast(code, f"{name} left")
         for i in games[str(code)]["people"]:

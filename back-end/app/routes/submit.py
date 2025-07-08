@@ -26,7 +26,7 @@ async def upload_written_submissions(code: int, id: int ,file : UploadFile = Fil
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         out = sqlQuery("UPDATE submissions SET submission_path = %s WHERE assignment_id = %s RETURNING *;",(response["files"][0]["name"],id,))
     else:
-        out = sqlQuery("INSERT INTO submissions (user_id, assignment_id, submission_path, grade) VALUES (%s, %s, %s, %s) RETURNING *;",(21,id,response["files"][0]["name"],None,))
+        out = sqlQuery("INSERT INTO submissions (user_id, assignment_id, submission_path, grade) VALUES (%s, %s, %s, %s) RETURNING *;",(tokenData.id,id,response["files"][0]["name"],None,))
     return out
 
 @router.get("/written")
@@ -40,3 +40,4 @@ def get_written_submissions(code: int, id: int, tokenData = Depends(oauth2.get_c
         x = getSubmissionFile(file_name=file_name["submission_path"]) # type: ignore
         if x:
             return StreamingResponse(x[0].iter_content(chunk_size=8192),media_type=x[1])
+        

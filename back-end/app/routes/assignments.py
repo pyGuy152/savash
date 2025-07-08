@@ -1,8 +1,8 @@
 from typing import List
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends, UploadFile, File
 from .. import oauth2
 from ..schemas import assignments_schemas
-from ..utils import sqlQuery
+from ..utils import sqlQuery, uploadSubmissionFile
 from ..sql_verification import checkCode, validateMcq, validateCoding, validateTfq, verifyTeacher, userInClass, assignmentInClass
 import random
 
@@ -77,7 +77,7 @@ def create_tfq_assignment(code:int,data:assignments_schemas.TFQAssignment,tokenD
     return new_assignment
 
 @router.post("/coding", response_model=assignments_schemas.AssignmentOut, status_code=status.HTTP_201_CREATED)
-def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,tokenData = Depends(oauth2.get_current_user)):
+async def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,code_file : UploadFile = File(...),tokenData = Depends(oauth2.get_current_user)):
     validateCoding(data)
     if not checkCode(code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail='not a valid code')
@@ -85,11 +85,12 @@ def create_coding_assignment(code:int,data:assignments_schemas.CodingAssignment,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Students cant create assigments')
     if not userInClass(tokenData.id,code):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User not in this class')
-    new_assignment = None
+    contents = await code_file.read()
+    response = uploadSubmissionFile(code_file.filename, contents, code_file.content_type)
+    new_assignment = sqlQuery('INSERT INTO coding (assignment_id, title, description, due_date, points, input, output, code, code_file) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;',(getNewAssignmentId(),data.title,data.description,data.due_date,data.points,data.input, data.output,code,response["files"][0]["name"],))
     if not new_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No new assignments were created")
     return new_assignment
-
 
 @router.get("/", response_model=List[assignments_schemas.AssignmentOut])
 def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
@@ -101,6 +102,7 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
     mcq = sqlQuery("SELECT * FROM mcq WHERE code = %s;",(code,),fetchALL=True)
     frq = sqlQuery("SELECT * FROM frq WHERE code = %s;",(code,),fetchALL=True)
     tfq = sqlQuery("SELECT * FROM tfq WHERE code = %s;",(code,),fetchALL=True)
+    coding = sqlQuery("SELECT * FROM coding WHERE code = %s;",(code,),fetchALL=True)
     if not written:
         written = []
     elif isinstance(written,tuple):
@@ -117,8 +119,11 @@ def get_assignments(code: int, tokenData = Depends(oauth2.get_current_user)):
         tfq = []
     elif isinstance(tfq,tuple):
         tfq = [tfq]
-
-    return written + mcq + frq + tfq
+    if not coding:
+        coding = []
+    elif isinstance(coding,tuple):
+        coding = [coding]
+    return written + mcq + frq + tfq + coding
 
 @router.get("/{id}")
 def get_assignment_by_id(code: int, id: int, tokenData = Depends(oauth2.get_current_user)):
@@ -132,7 +137,7 @@ def get_assignment_by_id(code: int, id: int, tokenData = Depends(oauth2.get_curr
     mcq = sqlQuery("SELECT * FROM mcq WHERE code = %s AND assignment_id = %s;",(code,id,))
     frq = sqlQuery("SELECT * FROM frq WHERE code = %s AND assignment_id = %s;",(code,id,))
     tfq = sqlQuery("SELECT * FROM tfq WHERE code = %s AND assignment_id = %s;",(code,id,))
-    
+    coding = sqlQuery("SELECT * FROM coding WHERE code = %s AND assignment_id = %s;",(code,id,))
     if written:
         return written
     elif mcq:
@@ -141,6 +146,8 @@ def get_assignment_by_id(code: int, id: int, tokenData = Depends(oauth2.get_curr
         return frq
     elif tfq:
         return tfq
+    elif coding:
+        return coding
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assignment not found")
 
@@ -161,6 +168,8 @@ def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenD
         try_update_tfq_assignment = sqlQuery("UPDATE tfq SET title = %s, description = %s, questions = %s ,correct_answer = %s ,due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.questions,data.correct_answer,data.due_date,data.points,data.assignment_id,))
     elif data.questions:
         try_update_frq_assignment = sqlQuery("UPDATE frq SET title = %s, description = %s, questions = %s ,due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.questions,data.due_date,data.points,data.assignment_id,))
+    elif data.input and data.output:
+        try_update_coding_assignment = sqlQuery("UPDATE coding SET title = %s, description = %s, input = %s, output = %s, due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.input,data.output,data.due_date,data.points,data.assignment_id,))
     else:
         try_update_written_assignment = sqlQuery("UPDATE written SET title = %s, description = %s, due_date = %s, points = %s WHERE assignment_id = %s RETURNING *;",(data.title,data.description,data.due_date,data.points,data.assignment_id,))
 
@@ -172,6 +181,8 @@ def update_assignment(code:int, data:assignments_schemas.UpdateAssignment,tokenD
         return try_update_frq_assignment
     elif try_update_written_assignment:
         return try_update_written_assignment
+    elif try_update_coding_assignment:
+        return try_update_coding_assignment
     else:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='No assignments were updated')
 
@@ -187,6 +198,7 @@ def delete_assignment(code:int,data:assignments_schemas.DeleteAssignment,tokenDa
     del_frq_assignment = sqlQuery("DELETE FROM frq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
     del_mcq_assignment = sqlQuery("DELETE FROM mcq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
     del_tfq_assignment = sqlQuery("DELETE FROM tfq WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
-    if not del_written_assignment and not del_frq_assignment and not del_mcq_assignment and not del_tfq_assignment:
+    del_coding_assignment = sqlQuery("DELETE FROM coding WHERE assignment_id = %s AND code = %s RETURNING *;",(data.assignment_id,code,))
+    if not del_written_assignment and not del_frq_assignment and not del_mcq_assignment and not del_tfq_assignment and not del_coding_assignment:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Error, No assignments were deleted")
 
