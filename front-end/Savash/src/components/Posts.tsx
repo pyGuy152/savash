@@ -55,7 +55,8 @@ function Posts({ classID } : PostsProps){
                   <p>{post.content}</p>
                 </div>
                 <div className="row">
-                  <p className="post-meta">{post.username}</p>
+                  <p className="post-meta">{post.user_name}</p>
+                  <p className="post-meta">-</p>
                   <p className="post-meta">
                     {post.posted_at.toLocaleDateString()}
                   </p>
