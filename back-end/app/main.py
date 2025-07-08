@@ -8,10 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from .utils import sqlQuery
 app = FastAPI()
 
-# Setup db
-sqlQuery('CREATE TABLE IF NOT EXISTS class (code INTEGER PRIMARY KEY, name VARCHAR NOT NULL, created_at DATE DEFAULT CURRENT_DATE, owner INTEGER NOT NULL);',())
-sqlQuery('CREATE TABLE IF NOT EXISTS coding (assignment_id INTEGER PRIMARY KEY, title VARCHAR, description VARCHAR, due_date DATE, points INTEGER, code_file VARCHAR, input VARCHAR[][], output VARCHAR[], created_at TIMESTAMPTZ DEFAULT NOW(), code INTEGER, FOREIGN KEY (code) REFERENCES class(code) ON DELETE CASCADE);',())
-
+# Setup db - runs only once at startup
+@app.on_event("startup")
+async def startup_event():
+    sqlQuery('CREATE TABLE IF NOT EXISTS class (code INTEGER PRIMARY KEY, name VARCHAR NOT NULL, created_at DATE DEFAULT CURRENT_DATE, owner INTEGER NOT NULL);',(),fetchNone=True)
+    sqlQuery('CREATE TABLE IF NOT EXISTS coding (assignment_id INTEGER PRIMARY KEY, title VARCHAR, description VARCHAR, due_date DATE, points INTEGER, code_file VARCHAR, input VARCHAR[][], output VARCHAR[], created_at TIMESTAMPTZ DEFAULT NOW(), code INTEGER, FOREIGN KEY (code) REFERENCES class(code) ON DELETE CASCADE);',(),fetchNone=True)
+    sqlQuery('CREATE TABLE IF NOT EXISTS frq ();',(),fetchNone=True)
 
 origins = [
     'https://savash.rohanjain.xyz',
