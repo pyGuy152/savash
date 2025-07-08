@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import "./App.css";
 import HomeNav from "./components/HomeNav";
-import { apiUrl, getToken, LOGOUT } from "./types";
+import { apiUrl, getToken } from "./types";
 import { useNavigate } from "react-router-dom";
 
 
