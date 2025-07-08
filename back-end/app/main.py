@@ -5,7 +5,13 @@ from pydantic import BaseModel
 from .routes import auth, users, classes, assignments, posts, games, submit, run, graphQL
 from .oauth2 import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
+from .utils import sqlQuery
 app = FastAPI()
+
+# Setup db
+sqlQuery('CREATE TABLE IF NOT EXISTS class (code INTEGER PRIMARY KEY, name VARCHAR NOT NULL, created_at DATE DEFAULT CURRENT_DATE, owner INTEGER NOT NULL);',())
+sqlQuery('CREATE TABLE IF NOT EXISTS coding (assignment_id INTEGER PRIMARY KEY, title VARCHAR, description VARCHAR, due_date DATE, points INTEGER, code_file VARCHAR, input VARCHAR[][], output VARCHAR[], created_at TIMESTAMPTZ DEFAULT NOW(), code INTEGER, FOREIGN KEY (code) REFERENCES class(code) ON DELETE CASCADE);',())
+
 
 origins = [
     'https://savash.rohanjain.xyz',
