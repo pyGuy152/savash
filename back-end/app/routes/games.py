@@ -155,7 +155,6 @@ async def game(websocket: WebSocket,code: str, name: str):
                                 else:
                                     await manager.send_json({'message':'Incorrect'},websocket)
                 except Exception as e:
-                    print(e)
                     for i in range(len(games[str(code)]["people"])):
                         if games[str(code)]["people"][i]["name"] == name:
                             games[str(code)]["people"][i]["pos"] = jsonn['pos']
