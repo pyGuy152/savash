@@ -13,9 +13,9 @@ Savash is a next-generation educational platform designed to unify and streamlin
 
 - 🔐 **Authentication** – Secure login for students and teachers
 - 🏫 **Classroom Management** – Create, join, and manage digital classrooms
-- 📝 **Assignments System (Work in progress)** – Teachers can post assignments; students can submit work
+- 📝 **Assignments System** – Teachers can post assignments; students can submit work
 - 🧠 **AI Integration (Upcoming)** – Tools to rewrite prompts, suggest content, or give feedback using LLMs
-- 🎮 **Gamified Learning (Planned)** – Host and play educational games inspired by Kahoot, Gimkit, and Blooket
+- 🎮 **Gamified Learning** – Host and play educational games inspired by Kahoot, Gimkit, and Blooket
 - 📊 **Analytics Dashboard (Planned)** – See student performance and class insights in real-time
 
 ---
