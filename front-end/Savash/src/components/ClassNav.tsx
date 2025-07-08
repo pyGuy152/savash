@@ -124,7 +124,6 @@ function ClassNav({ classSelected, inviteModalToggle }: ClassNavProps) {
       })
       .then((data) => {
         console.log("Post created successfully:", data);
-        window.location.reload();
       })
       .catch((error) => {
         console.error("Error creating post:", error);
