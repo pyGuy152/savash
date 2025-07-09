@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from .routes import auth, users, classes, assignments, posts, games, submit, run
 from .oauth2 import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
-from .utils import sqlQuery
+from .utils import sqlQuery, askAI
 app = FastAPI()
 
 # Setup db - runs only once at startup
@@ -60,3 +60,10 @@ async def receive_raw_email(request: Request):
         if '"to":' in i:
             print(i)
     return {"status": "parsed raw email"}
+
+class Ai_input(BaseModel):
+    prompt: str
+
+@app.post("/assistant")
+def ask_ai_assistant(data: Ai_input, tokenData = Depends(get_current_user)):
+    return {"assistant":askAI(f"You are a teacher and a student asked - {data.prompt}")}

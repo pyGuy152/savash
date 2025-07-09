@@ -9,7 +9,6 @@ from ..sql_verification import checkCode, verifyTeacher, userInClass, checkEmail
 
 router = APIRouter(prefix='/classes',tags=['Classes'])
 
-
 @router.post("/", response_model=classes_schemas.ClassOut, status_code=status.HTTP_201_CREATED)
 def make_class(class_data: classes_schemas.ClassMake, tokenData = Depends(oauth2.get_current_user)):
     code = str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))+str(random.randint(0,9))
